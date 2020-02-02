@@ -147,9 +147,9 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mastodon-web.rule=Host(`${TOP_DOMAIN}`)"
-      - "traefik.http.routers.mastodon-web.entrypoints=websecure"
-      - "traefik.http.routers.mastodon-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.hometown-web.rule=Host(`${TOP_DOMAIN}`)"
+      - "traefik.http.routers.hometown-web.entrypoints=websecure"
+      - "traefik.http.routers.hometown-web.tls.certresolver=letsencrypt"
     volumes:
       - ./data/hometown/public/system:/mastodon/public/system
     networks:
@@ -172,9 +172,9 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mastodon-streaming.rule=(Host(`${TOP_DOMAIN}`) && PathPrefix(`/api/v1/streaming`))"
-      - "traefik.http.routers.mastodon-streaming.entrypoints=websecure"
-      - "traefik.http.routers.mastodon-streaming.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.hometown-streaming.rule=(Host(`${TOP_DOMAIN}`) && PathPrefix(`/api/v1/streaming`))"
+      - "traefik.http.routers.hometown-streaming.entrypoints=websecure"
+      - "traefik.http.routers.hometown-streaming.tls.certresolver=letsencrypt"
     networks:
       - external_network
       - internal_network
