@@ -7,6 +7,11 @@ sh -c "$(curl -fsSL https://raw.github.com/queerhaus/hosting/master/provision.sh
 ```
 **NOTE:** Script not guaranteed to work, we ran commands manually step by step.
 
+
+## Maintenance
+Run the mastodon cli tool like this:
+`docker-compose exec town-web tootctl <command>`
+
 ## Notes
 Mastodon setup taken from this very detailed guide 
 https://www.innoq.com/en/blog/traefik-v2-and-mastodon/

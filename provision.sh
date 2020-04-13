@@ -1,6 +1,9 @@
 #!/bin/sh
 
-# NOTICE: This script is interactive and will ask some questions!
+# WARNING: This script has never actually been run! It is a collection of commands run over time on our server. 
+# Probably safer to copy paste a few commands at a time rather than running the full script!
+
+# NOTICE: If you do run this script, it is interactive and will ask some questions!
 
 # Remove password authentication and disable ssh login for root
 # TODO these sed commands duplicate the entire config file and breaks it, have to do manually :(
@@ -24,6 +27,7 @@ apt-get install -y --no-install-recommends \
     docker-compose \
     zsh \
     git \
+    tig \
     fail2ban \
     iptables-persistent
 
@@ -103,6 +107,21 @@ tee /etc/iptables/rules.v4 <<EOF
 COMMIT
 EOF
 iptables-restore < /etc/iptables/rules.v4
+
+# Add backup script to cron
+tee /etc/cron.d/queerhaus <<EOF
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# minute (0 - 59)
+# hour (0 - 23)
+# day of the month (1 - 31)
+# month (1 - 12)
+# day of the week (0 - 6) (Sunday to Saturday; 7 is also Sunday on some systems)
+# * * * * *   user    command to execute
+
+0 4 * * *   admin    /opt/queerhaus/backup.sh
+EOF
 
 # Check out this project
 mkdir -p /opt/queerhaus
