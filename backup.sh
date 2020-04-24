@@ -1,13 +1,17 @@
 #!/bin/sh
+#set -eux
+current_date=$(date +%d-%m-%Y_%H_%M_%S)
 
 # mastodon hometown
 # https://docs.joinmastodon.org/admin/backups/
-docker exec -u postgres queerhaus_town-db_1 pg_dumpall -c > /opt/queerhaus/data/backups/hometown/town_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
-rsync -a --delete /opt/queerhaus/data/hometown/public/ /opt/queerhaus/data/backups/hometown/public/
+mkdir -p /opt/queerhaus/backup/hometown/$current_date
+docker exec -u postgres queerhaus_town-db_1 pg_dumpall -c > /opt/queerhaus/backup/hometown/$current_date/town_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+rsync -a --delete /opt/queerhaus/data/hometown/public/ /opt/queerhaus/backup/hometown/$current_date/public/
 
 # codimd
-docker exec -u postgres queerhaus_codi-db_1 pg_dumpall -U codimd -c > /opt/queerhaus/data/backups/codi/codi_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
-rsync -a --delete /opt/queerhaus/data/codi/uploads/ /opt/queerhaus/data/backups/codi/uploads/
+mkdir -p /opt/queerhaus/backup/codi/$current_date
+docker exec -u postgres queerhaus_codi-db_1 pg_dumpall -U codimd -c > /opt/queerhaus/backup/codi/$current_date/codi_dump_`date +%d-%m-%Y"_"%H_%M_%S`.sql
+rsync -a --delete /opt/queerhaus/data/codi/uploads/ /opt/queerhaus/backup/codi/$current_date/uploads/
 
 # Restore backups like this
 # cat codi_dump.sql | docker exec -i queerhaus_codi-db_1 psql -U codimd
