@@ -1,6 +1,6 @@
 #!/bin/sh
 #set -eux
-current_date=$(date +%d-%m-%Y_%H_%M_%S)
+current_date=$(date +%Y-%m-%d_%H_%M_%S)
 
 # mastodon hometown
 # https://docs.joinmastodon.org/admin/backups/
