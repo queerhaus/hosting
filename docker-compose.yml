@@ -118,6 +118,9 @@ services:
       test: ["CMD", "pg_isready", "-U", "postgres"]
     volumes:
       - ./data/hometown/postgres:/var/lib/postgresql/data
+    environment:
+      # Disable authentication  https://www.postgresql.org/docs/current/auth-trust.html
+      POSTGRES_HOST_AUTH_METHOD: trust
     networks:
       - internal_network
 

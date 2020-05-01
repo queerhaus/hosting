@@ -120,6 +120,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # day of the week (0 - 6) (Sunday to Saturday; 7 is also Sunday on some systems)
 # * * * * *   user    command to execute
 
+0 3 * * *   admin    docker system prune -f
 0 4 * * *   admin    /opt/queerhaus/backup.sh
 EOF
 
@@ -147,6 +148,8 @@ nano .env
 
 # Run mastodon setup guide
 touch .env.hometown
-chown 991:991 .env.hometown
+chown 991:991 .env.hometown  # do this step only on linux hosts where docker is running directly on the same host
 docker-compose run --rm -v $(pwd)/.env.hometown:/opt/mastodon/.env.production town-web bundle exec rake mastodon:setup
-
+# postgres host: town-db
+# redis host: town-redis
+# other settings default, passwords empty
