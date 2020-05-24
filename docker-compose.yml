@@ -154,7 +154,7 @@ services:
       - "traefik.http.routers.town-web.entrypoints=websecure"
       - "traefik.http.routers.town-web.tls.certresolver=letsencrypt"
     volumes:
-      - ./data/hometown/public/system:/mastodon/public/system
+      - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
     networks:
       - external_network
       - internal_network
@@ -194,7 +194,7 @@ services:
       - town-redis
       - traefik
     volumes:
-      - ./data/hometown/public/system:/mastodon/public/system
+      - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
     networks:
       - external_network
       - internal_network
