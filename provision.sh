@@ -29,7 +29,9 @@ apt-get install -y --no-install-recommends \
     git \
     tig \
     fail2ban \
-    iptables-persistent
+    iptables-persistent \
+    gnupg2 \
+    pass
 
 # Create admin user for later sudo use
 adduser admin
