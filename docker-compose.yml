@@ -96,7 +96,6 @@ services:
       CMD_ALLOW_GRAVATAR: "false"
     depends_on:
       - codi-db
-      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codi-web.rule=Host(`codimd.${TOP_DOMAIN}`)"
@@ -147,7 +146,6 @@ services:
     depends_on:
       - town-db
       - town-redis
-      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.town-web.rule=Host(`${TOP_DOMAIN}`)"
@@ -172,7 +170,6 @@ services:
     depends_on:
       - town-db
       - town-redis
-      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.town-streaming.rule=(Host(`${TOP_DOMAIN}`) && PathPrefix(`/api/v1/streaming`))"
@@ -192,7 +189,6 @@ services:
     depends_on:
       - town-db
       - town-redis
-      - traefik
     volumes:
       - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
     networks:
