@@ -1,3 +1,0 @@
-[submodule "submodules/hometown"]
-	path = submodules/hometown
-	url = git@github.com:hometown-fork/hometown.git

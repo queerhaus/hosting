@@ -135,7 +135,6 @@ services:
 
   town-web:
     image: docker.pkg.github.com/queerhaus/hometown/hometown:master
-    #build: submodules/hometown
     restart: unless-stopped
     env_file: .env.hometown
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
@@ -159,7 +158,6 @@ services:
 
   town-streaming:
     image: docker.pkg.github.com/queerhaus/hometown/hometown:master
-    #build: submodules/hometown
     restart: unless-stopped
     env_file: .env.hometown
     command: node ./streaming
@@ -182,7 +180,6 @@ services:
 
   town-sidekiq:
     image: docker.pkg.github.com/queerhaus/hometown/hometown:master
-    #build: submodules/hometown
     restart: unless-stopped
     env_file: .env.hometown
     command: bundle exec sidekiq
