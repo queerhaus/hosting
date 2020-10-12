@@ -11,13 +11,15 @@ services:
 # TRAEFIK #
 ###########
   traefik:
-    image: traefik:2.1
+    image: traefik:2.2
     restart: unless-stopped
     command: 
-#      - "--log.level=DEBUG"
+      #- "--log.level=DEBUG"
       - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
@@ -39,11 +41,6 @@ services:
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.middlewares=dashboardauth"
       - "traefik.http.middlewares.dashboardauth.basicauth.users=${TRAEFIK_USERNAME}:${TRAEFIK_PASSWORD}"
-      # HTTPS Redirect
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https@docker"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     networks:
       - external_network
 
@@ -193,3 +190,50 @@ services:
       - external_network
       - internal_network
 
+
+#############
+# NEXTCLOUD #
+#############
+  nextcloud-db:
+    image: mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: unless-stopped
+    volumes:
+      - ./data/nextcloud/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    networks:
+      - internal_network
+
+  nextcloud-app:
+    image: nextcloud
+    depends_on:
+      - nextcloud-db
+      - traefik
+    volumes:
+      - ./data/nextcloud/app:/var/www/html
+    environment:
+      MYSQL_HOST: nextcloud-db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD}
+      APACHE_DISABLE_REWRITE_IP: 1
+      TRUSTED_PROXIES: traefik
+      NEXTCLOUD_TRUSTED_DOMAINS: cloud.${TOP_DOMAIN}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`cloud.${TOP_DOMAIN}`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.nextcloud-headers.headers.stsseconds=15552000"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.replacement=https://$${1}/remote.php/dav/"
+      - "traefik.http.middlewares.nextcloud-redirect.redirectregex.permanent=true"
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud-redirect@docker,nextcloud-headers@docker"
+    networks:
+      - external_network
+      - internal_network
