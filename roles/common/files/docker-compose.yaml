@@ -1,0 +1,68 @@
+version: '3.5'
+
+networks:
+  external_network:
+    name: queerhaus_external
+  internal_network:
+    name: queerhaus_internal
+    internal: true
+
+services:
+
+  traefik:
+    image: traefik:2.2
+    restart: unless-stopped
+    command: 
+      #- "--log.level=DEBUG"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=$TRAEFIK_ADMIN_EMAIL"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/letsencrypt:/letsencrypt
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.middlewares=dashboardauth,error-pages"
+      - "traefik.http.middlewares.dashboardauth.basicauth.users=${TRAEFIK_USERNAME}:${TRAEFIK_PASSWORD}" 
+    networks:
+      - external_network
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    volumes:
+      #- $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy:/srv
+      - ./data/caddy/data:/data
+      - ./data/caddy/config:/config
+    labels:
+      traefik.enable: true
+      traefik.http.routers.error-router.rule: HostRegexp(`{host:.+}`)
+      traefik.http.routers.error-router.priority: 1
+      traefik.http.routers.error-router.entrypoints: websecure
+      traefik.http.routers.error-router.middlewares: error-pages
+      traefik.http.middlewares.error-pages.errors.status: 400-599
+      traefik.http.middlewares.error-pages.errors.service: error-pages-service
+      traefik.http.middlewares.error-pages.errors.query: /error.html
+      #traefik.http.middlewares.error-pages.errors.query: /{status}.html
+      traefik.http.services.error-pages-service.loadbalancer.server.port: 80
+    networks:
+      - external_network
+      - internal_network
+

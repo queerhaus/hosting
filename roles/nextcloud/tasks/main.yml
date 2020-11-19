@@ -1,0 +1,45 @@
+---
+
+# - name: Install cronjob
+#   become: yes
+#   copy:
+#     src: etc/cron.d/queerhaus
+#     dest: /etc/cron.d/queerhaus
+
+- name: Create nextcloud directory
+  file:
+    path: /opt/queerhaus/nextcloud
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+# - name: Install backup script
+#   copy:
+#     src: opt/queerhaus/collab/backup.sh
+#     dest: /opt/queerhaus/collab/backup.sh
+#     group: queers
+#     mode: "u=rwx,g=rwx,o=rx"
+
+- name: Copy docker compose
+  copy:
+    src: docker-compose.yaml
+    dest: /opt/queerhaus/nextcloud/docker-compose.yaml
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Template env file
+  template:
+    src: .env
+    dest: /opt/queerhaus/nextcloud/.env
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Pull containers images (this will take time)
+  command: 
+    cmd: docker-compose pull
+    chdir: /opt/queerhaus/nextcloud
+
+- name: Start up containers (this can be slow)
+  command: 
+    cmd: docker-compose up -d --remove-orphans
+    chdir: /opt/queerhaus/nextcloud

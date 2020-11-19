@@ -1,0 +1,198 @@
+# ansible_user can change throughout this role, keep a copy around
+- name: Set configured user fact
+  set_fact:
+    configured_user: "{{ ansible_user }}"
+
+# if this is a new host we have direct access with root user
+- name: Check if root user has access
+  command: ssh -q -p 22 -o BatchMode=yes -o ConnectTimeout=3 root@{{ inventory_hostname }} "echo OK"
+  delegate_to: localhost
+  failed_when: false
+  changed_when: false
+  register: check_root_user
+
+# If reachable, continue the following tasks with this user
+- name: Set inventory ansible_user to root
+  set_fact:
+    ansible_user: "root"
+  when: check_root_user.stdout is defined and check_root_user.stdout.find('OK') != -1
+  register: ssh_user_set
+
+
+# https://dmsimard.com/2016/03/15/changing-the-ssh-port-with-ansible/
+
+# ansible_port can change throughout this role, keep a copy around
+- name: Set configured port fact
+  set_fact:
+    configured_port: "{{ ansible_port }}"
+
+# From localhost, check if we're able to reach {{ inventory_hostname }} on
+# port 22
+- name: Check if we're using the default SSH port
+  wait_for:
+    port: "22"
+    state: "started"
+    host: "{{ inventory_hostname }}"
+    connect_timeout: "2"
+    timeout: "2"
+  delegate_to: "localhost"
+  failed_when: false
+  changed_when: false
+  register: default_ssh
+
+# If reachable, continue the following tasks with this port
+- name: Set inventory ansible_port to default
+  set_fact:
+    ansible_port: "22"
+  when: default_ssh is defined and
+        default_ssh.state is defined and
+        default_ssh.state == "started"
+
+# Sanity check, make sure Ansible is able to connect to the host
+- name: Confirm host connection works
+  ping:
+
+# Now we are ready to set up ssh and users as we want
+- name: Install required system packages
+  become: true
+  apt: 
+    name:
+      - fail2ban
+      - iptables-persistent
+      - zsh
+      - git
+      - tig
+    state: latest 
+    update_cache: yes
+
+
+- name: Create "queers" group
+  become: true
+  group:
+    name: queers
+    state: present
+
+- name: Create "docker" group
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: Add user accounts
+  become: true
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.sudo_password }}"
+    groups: [queers,sudo,docker]
+    state: present
+    shell: /usr/bin/zsh
+  with_items: "{{ queer_users }}"
+
+# https://serverfault.com/questions/830302/ensure-only-specific-list-of-users-exist-with-ansible
+# - name: Determine existing users
+#   shell: 'grep queers /etc/group | cut -d: -f4 | tr "," "\n"'
+#   changed_when: false 
+#   register: existing_users
+
+# - name: Determine removed users
+#   set_fact:
+#     removed_users: "{{ existing_users.stdout_lines | difference(queers) }}"
+
+# - name: Delete removed user accounts
+#   become: true
+#   user:
+#     name: "{{ item }}"
+#     state: absent
+#   with_items: "{{ removed_users }}"
+
+- name: Set up authorized keys
+  become: true
+  authorized_key:
+    user: "{{ item.0.name }}"
+    state: present
+    key: "{{ item.1 }}"
+  loop: "{{ queer_users | subelements('ssh_public_keys') }}"
+
+# https://github.com/veggiemonk/ansible-ohmyzsh/blob/master/tasks/main.yml
+- name: Cloning oh-my-zsh
+  become: true
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh
+    dest: /home/{{ item.name }}/.oh-my-zsh
+    update: true
+    accept_hostkey: true
+  with_items: "{{ queer_users }}"
+
+- name: Copy .zshrc
+  become: true
+  copy:
+    src: .zshrc
+    dest: /home/{{ item.name }}/.zshrc
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  with_items: "{{ queer_users }}"
+
+- name: Copy .tmux.conf
+  become: true
+  copy:
+    src: .tmux.conf
+    dest: /home/{{ item.name }}/.tmux.conf
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  with_items: "{{ queer_users }}"
+
+- name: sshd config
+  become: true
+  copy:
+    src: etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config
+    validate: /usr/sbin/sshd -t -f %s
+    backup: yes
+  notify:
+    - Restart sshd
+
+- name: fail2ban config
+  become: true
+  copy:
+    src: etc/fail2ban/jail.local
+    dest: /etc/fail2ban/jail.local
+  notify:
+    - Restart fail2ban
+
+- name: iptables rules
+  become: true
+  copy:
+    src: etc/iptables/rules.v4
+    dest: /etc/iptables/rules.v4
+  notify:
+    - Restore iptables
+
+# - name: UFW - Allow SSH connections
+#   ufw:
+#     rule: allow
+#     name: OpenSSH
+
+# - name: UFW - Deny all other incoming traffic by default
+#   ufw:
+#     state: enabled
+#     policy: deny
+#     direction: incoming
+
+
+# We notified "Restart sshd" if we modified the sshd config.
+# By calling flush_handlers, we make sure the handler is run *right now*
+- name: Ensure SSH is reloaded if need be
+  meta: flush_handlers
+
+# We're done, make sure ansible_port is set properly so that any tasks
+# after this use the right ansible_port.
+- name: Ensure we use the configured SSH port and user for the remainder of the role
+  set_fact:
+    ansible_port: "{{ configured_port }}"
+    ansible_user: "{{ configured_user }}"
+
+# Gather facts should be set to false when running this role since it will
+# fail if the Ansible SSH port is not set correctly.
+# We run setup to gather facts here once the SSH port is set up.
+- name: Run deferred setup to gather facts
+  setup:

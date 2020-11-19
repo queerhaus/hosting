@@ -1,0 +1,126 @@
+---
+# WARNING THESE UPLOADS ARE DESTRUCTIVE !!!
+# They will overwrite and delete files on the hosts!
+
+- name: Upload hometown data files from localhost
+  hosts: hometown_host
+  tags: hometown
+  tasks:
+  - name: Upload the data
+    synchronize:
+      src: backup/hometown/
+      dest: /opt/queerhaus/hometown/data_upload/
+      delete: yes
+
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/hometown
+
+  - name: Backup the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/hometown/data/
+      dest: /opt/queerhaus/hometown/data_backup/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Replace the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/hometown/data_upload/
+      dest: /opt/queerhaus/hometown/data/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Start all containers again
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/hometown
+
+
+- name: Upload codimd data files from localhost
+  hosts: collab_host
+  tags: 
+    - codimd
+    - collab
+  tasks:
+  - name: Upload the data
+    synchronize:
+      src: backup/codimd/
+      dest: /opt/queerhaus/codimd/data_upload/
+      delete: yes
+
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/codimd
+
+  - name: Backup the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/codimd/data/
+      dest: /opt/queerhaus/codimd/data_backup/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Replace the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/codimd/data_upload/
+      dest: /opt/queerhaus/codimd/data/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Start all containers again
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/codimd
+
+
+- name: Upload nextcloud data files from localhost
+  hosts: collab_host
+  tags: 
+    - nextcloud
+    - collab
+  tasks:
+  - name: Upload the data
+    synchronize:
+      src: backup/nextcloud/
+      dest: /opt/queerhaus/nextcloud/data_upload/
+      delete: yes
+
+  - name: Change ownership of data
+    become: yes
+    file:
+      path: /opt/queerhaus/nextcloud/data_upload/
+      state: directory
+      recurse: yes
+      owner: "33"
+      group: queers
+
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/nextcloud
+
+  - name: Backup the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/nextcloud/data/
+      dest: /opt/queerhaus/nextcloud/data_backup/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Replace the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/nextcloud/data_upload/
+      dest: /opt/queerhaus/nextcloud/data/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Start all containers again
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/nextcloud

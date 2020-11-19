@@ -1,0 +1,119 @@
+---
+
+- name: Ensure locale en_US exists
+  become: yes
+  community.general.locale_gen:
+    name: en_US.UTF-8
+    state: present
+
+- name: Ensure locale de_DE exists
+  become: yes
+  community.general.locale_gen:
+    name: de_DE.UTF-8
+    state: present
+
+- name: Install helpful packages
+  become: yes
+  apt: 
+    name:
+      - tig
+      - htop
+      - glances
+      - tmux
+      - mosh
+    state: latest 
+    update_cache: yes
+
+- name: Install required system packages
+  become: true
+  apt: 
+    name:
+      - docker.io
+      - docker-compose
+    state: latest 
+    update_cache: no
+
+- name: Add users to docker group
+  become: true
+  user:
+    name: "{{ item.name }}"
+    groups: docker
+    append: yes
+  with_items: "{{ queer_users }}"
+
+- name: Create .docker directory
+  become: true
+  file:
+    path: /home/{{ item.name }}/.docker
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  with_items: "{{ queer_users }}"
+
+- name: Create docker config with auth token
+  become: true
+  template:
+    src: docker-config.json
+    dest: /home/{{ item.name }}/.docker/config.json
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  with_items: "{{ queer_users }}"
+
+- name: Ensure docker is running
+  become: yes
+  service:
+    name: docker
+    state: started
+
+- name: Install docker purge cronjob
+  become: yes
+  copy:
+    src: etc/cron.d/queerdocker
+    dest: /etc/cron.d/queerdocker
+
+- name: Create queerhaus directory
+  become: true
+  file:
+    path: /opt/queerhaus
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Create queerhaus/common directory
+  become: true
+  file:
+    path: /opt/queerhaus/common
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Copy docker compose
+  copy:
+    src: docker-compose.yaml
+    dest: /opt/queerhaus/common/docker-compose.yaml
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Template env file
+  template:
+    src: .env
+    dest: /opt/queerhaus/common/.env
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Copy caddy site
+  copy:
+    src: caddy/
+    dest: /opt/queerhaus/common/caddy/
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Pull containers images
+  command: 
+    cmd: docker-compose pull
+    chdir: /opt/queerhaus/common
+
+- name: Start up containers
+  command: 
+    cmd: docker-compose up -d --remove-orphans
+    chdir: /opt/queerhaus/common

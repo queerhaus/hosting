@@ -1,0 +1,68 @@
+version: '3.5'
+
+networks:
+  external_network:
+    name: queerhaus_external
+    external: true
+  internal_network:
+    name: queerhaus_internal
+    internal: true
+    external: true
+
+services:
+
+  codi-db:
+    # Don't upgrade PostgreSQL by simply changing the version number
+    # You need to migrate the Database to the new PostgreSQL version
+    image: postgres:9.6-alpine
+    restart: unless-stopped
+    #mem_limit: 256mb         # version 2 only
+    #memswap_limit: 512mb     # version 2 only
+    #read_only: true          # not supported in swarm mode please enable along with tmpfs
+    #tmpfs:
+    #  - /run/postgresql:size=512K
+    #  - /tmp:size=256K
+    environment:
+      - POSTGRES_USER=codimd
+      - POSTGRES_PASSWORD=codimdpass
+      - POSTGRES_DB=codimd
+    volumes:
+      - ./data/codi/postgres:/var/lib/postgresql/data
+    networks:
+      - internal_network
+
+  codi-web:
+    image: linuxserver/codimd:version-1.6.0
+    restart: unless-stopped
+    #mem_limit: 256mb         # version 2 only
+    #memswap_limit: 512mb     # version 2 only
+    #read_only: true          # not supported in swarm mode, enable along with tmpfs
+    #tmpfs:
+    #  - /tmp:size=512K
+    #  - /codimd/tmp:size=1M
+    volumes:
+      - ./data/codi/uploads:/codimd/public/uploads
+    environment:
+      CMD_DB_URL: postgres://codimd:codimdpass@codi-db:5432/codimd
+      CMD_FORBIDDEN_NOTE_IDS: robots.txt
+      CMD_IMAGE_UPLOAD_TYPE: filesystem
+      CMD_PORT: 3000
+      CMD_DOMAIN: codimd.${TOP_DOMAIN}
+      CMD_PROTOCOL_USESSL: "true"
+      CMD_USECDN: "false"
+      CMD_URL_ADDPORT: "false"
+      CMD_EMAIL: "false"
+      CMD_ALLOW_EMAIL_REGISTER: "false"
+      CMD_ALLOW_GRAVATAR: "false"
+      CMD_ALLOW_FREEURL: "true"
+    depends_on:
+      - codi-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codi-web.rule=Host(`codimd.${TOP_DOMAIN}`)"
+      - "traefik.http.routers.codi-web.entrypoints=websecure"
+      - "traefik.http.routers.codi-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.codi-web.loadbalancer.server.port=3000"
+    networks:
+      - external_network
+      - internal_network

@@ -1,0 +1,36 @@
+---
+
+- name: set up ssh service and users
+  hosts: all
+  tags: common
+  gather_facts: false
+  roles:
+    - basic
+
+- name: Set up floating IPs
+  hosts: floating_ip
+  tags: common
+  roles:
+    - floating_ip
+
+- name: install docker and traefik
+  hosts: all
+  tags: common
+  roles:
+    - common
+
+- name: set up hometown host
+  hosts: hometown_host
+  tags: hometown
+  roles:
+    - hometown
+
+- name: set up collab host
+  hosts: collab_host
+  tags: 
+    - collab
+    - codimd
+    - nextcloud
+  roles:
+    - codimd
+    - nextcloud

@@ -1,0 +1,11 @@
+[DEFAULT]
+destemail = queerhaus@protonmail.com
+sendername = Fail2Ban
+
+[sshd]
+enabled = true
+port = 2020
+
+[sshd-ddos]
+enabled = true
+port = 2020

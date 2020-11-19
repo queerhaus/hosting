@@ -1,0 +1,25 @@
+- name: Restart fail2ban
+  become: yes
+  service:
+    name: fail2ban
+    state: restarted
+
+- name: Restart sshd
+  become: yes
+  service:
+    name: sshd
+    state: restarted
+
+- name: Restart docker
+  become: yes
+  service:
+    name: docker
+    state: restarted
+
+# Sadly after doing this we need to restart docker
+# otherwise containers might fail to set up iptables rules
+- name: Restore iptables
+  become: yes
+  shell: iptables-restore < /etc/iptables/rules.v4
+  notify:
+    - Restart docker

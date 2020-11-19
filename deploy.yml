@@ -1,0 +1,16 @@
+---
+
+- name: Download new hometown image and restart service
+  hosts: hometown_host
+  tags: hometown
+  tasks:
+
+  - name: Pull new images
+    command:
+      cmd: docker-compose pull
+      chdir: /opt/queerhaus/hometown
+
+  - name: Restart containers as needed
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/hometown

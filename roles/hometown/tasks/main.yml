@@ -1,0 +1,52 @@
+---
+
+- name: Install cronjob
+  become: yes
+  copy:
+    src: etc/cron.d/queertown
+    dest: /etc/cron.d/queertown
+
+- name: Create hometown directory
+  file:
+    path: /opt/queerhaus/hometown
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Install backup script
+  copy:
+    src: backup.sh
+    dest: /opt/queerhaus/hometown/backup.sh
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: Copy docker setup
+  copy:
+    src: docker-compose.yaml
+    dest: /opt/queerhaus/hometown/docker-compose.yaml
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Templae env file
+  template:
+    src: .env
+    dest: /opt/queerhaus/hometown/.env
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Template hometown env file
+  template:
+    src: .env.hometown
+    dest: /opt/queerhaus/hometown/.env.hometown
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Pull containers images
+  command: 
+    cmd: docker-compose pull
+    chdir: /opt/queerhaus/hometown
+
+- name: Start up containers
+  command: 
+    cmd: docker-compose up -d --remove-orphans
+    chdir: /opt/queerhaus/hometown

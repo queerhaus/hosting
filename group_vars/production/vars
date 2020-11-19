@@ -1,0 +1,15 @@
+---
+top_domain: queer.haus
+traefik_admin_email: queerhaus@protonmail.com
+
+hometown_config:
+  system_mountpoint: /mnt/HC_Volume_5261419/queerhaus/data/hometown/public/system
+  secret_key_base: "{{ vault_hometown.secret_key_base }}"
+  otp_secret: "{{ vault_hometown.otp_secret }}"
+  vapid_private_key: "{{ vault_hometown.vapid_private_key }}"
+  vapid_public_key: "{{ vault_hometown.vapid_public_key }}"
+
+nextcloud_config:
+  app_mountpoint: /mnt/HC_Volume_8042163/queerhaus/nextcloud/app
+  mysql_root_password: "{{ vault_nextcloud_mysql_root_password }}"
+  mysql_password: "{{ vault_nextcloud_mysql_password }}"

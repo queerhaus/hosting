@@ -1,0 +1,59 @@
+---
+
+- name: Force restart common containers
+  hosts: all
+  tags: common
+  tasks:
+  - name: Restart all containers
+    command:
+      cmd: docker-compose restart
+      chdir: /opt/queerhaus/common
+
+
+- name: Force restart hometown containers
+  hosts: hometown_host
+  tags: hometown
+  tasks:
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/hometown
+
+  - name: Start all containers (it will take a few minutes even after this for the site to come up)
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/hometown
+
+
+- name: Force restart nextcloud containers
+  hosts: collab_host
+  tags: 
+    - collab
+    - nextcloud
+  tasks:
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/nextcloud
+
+  - name: Start all containers (it will take a few minutes even after this for the site to come up)
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/nextcloud
+
+
+- name: Force restart codimd containers
+  hosts: collab_host
+  tags: 
+    - collab
+    - codimd
+  tasks:
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/codimd
+
+  - name: Start all containers (it will take a few minutes even after this for the site to come up)
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/codimd

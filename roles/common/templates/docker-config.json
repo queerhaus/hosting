@@ -1,0 +1,7 @@
+{
+    "auths": {
+        "docker.pkg.github.com": {
+            "auth": "{{ item.github_personal_access_token }}"
+        }
+    }
+}
