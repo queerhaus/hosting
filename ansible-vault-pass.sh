@@ -79,4 +79,4 @@ if [ $? -ne 0 ]; then
 fi
 
 # Retrieve the vault password and print it
-echo $vault_password
+echo -n $vault_password
