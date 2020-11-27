@@ -3,7 +3,7 @@ top_domain: queer.haus
 traefik_admin_email: queerhaus@protonmail.com
 
 hometown_config:
-  system_mountpoint: /mnt/HC_Volume_5261419/queerhaus/data/hometown/public/system
+  system_mountpoint: /mnt/HC_Volume_8160201/queerhaus/data/hometown/public/system
   secret_key_base: "{{ vault_hometown.secret_key_base }}"
   otp_secret: "{{ vault_hometown.otp_secret }}"
   vapid_private_key: "{{ vault_hometown.vapid_private_key }}"
