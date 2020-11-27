@@ -1,17 +1,19 @@
 # This is only a set of shortcuts, you can also run the ansible-playbook command directly
+depend:
+	ansible-galaxy install -r requirements.yml
 
 stage: staging
 stage-common: staging-common
-staging:
+staging: 
 	ansible-playbook -i hosts/staging site.yml -D -v -K
 staging-common:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
-production:
+production: depend
 	ansible-playbook -i hosts/production site.yml -D -v -K
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C
-production-dry:
+production-dry: depend
 	ansible-playbook -i hosts/production site.yml -D -v -K -C
 
 download-staging:
