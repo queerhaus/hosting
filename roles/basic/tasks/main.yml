@@ -61,7 +61,6 @@
       - iptables-persistent
       - zsh
       - git
-      - tig
     state: latest 
     update_cache: yes
 
