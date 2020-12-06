@@ -9,18 +9,20 @@ staging:
 	ansible-playbook -i hosts/staging site.yml -D -v -K
 staging-common:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
-production: depend
+production:
 	ansible-playbook -i hosts/production site.yml -D -v -K
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C
-production-dry: depend
+production-dry:
 	ansible-playbook -i hosts/production site.yml -D -v -K -C
 
 download-staging:
-	ansible-playbook -i hosts/staging download.yml -D -v -K
+	ansible-playbook -i hosts/staging download.yml -K
 download-production:
-	ansible-playbook -i hosts/production download.yml -D -v -K
+	ansible-playbook -i hosts/production download.yml -K
+download-hometown:
+	ansible-playbook -i hosts/production download.yml -K -t hometown
 
 deploy-hometown-staging:
 	ansible-playbook -i hosts/staging deploy.yml -D -v -t hometown

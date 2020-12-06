@@ -38,6 +38,7 @@
     file:
       path: "backup/common/{{ inventory_hostname }}"
       state: directory
+      recurse: yes
     delegate_to: localhost
 
   - name: Download the data
@@ -79,6 +80,13 @@
       owner: "{{ ansible_user }}"
       group: queers
 
+  - name: Create local dir
+    file:
+      path: backup/hometown/
+      state: directory
+      recurse: yes
+    delegate_to: localhost
+
   - name: Download the data
     synchronize:
       mode: pull
@@ -119,6 +127,13 @@
       owner: "{{ ansible_user }}"
       group: queers
 
+  - name: Create local dir
+    file:
+      path: backup/codimd/
+      state: directory
+      recurse: yes
+    delegate_to: localhost
+
   - name: Download the data
     synchronize:
       mode: pull
@@ -127,49 +142,49 @@
       delete: yes
 
 
-- name: Copy nextcloud database and files to localhost
-  hosts: collab_host
-  tags: nextcloud
-  tasks:
+# - name: Copy nextcloud database and files to localhost
+#   hosts: collab_host
+#   tags: nextcloud
+#   tasks:
 
-  - name: Stop all containers
-    command:
-      cmd: docker-compose stop
-      chdir: /opt/queerhaus/nextcloud
+#   - name: Stop all containers
+#     command:
+#       cmd: docker-compose stop
+#       chdir: /opt/queerhaus/nextcloud
 
-  - name: Make a copy of the usual data dir
-    become: yes
-    synchronize:
-      src: /opt/queerhaus/nextcloud/data/app
-      dest: /opt/queerhaus/nextcloud/data_copy/
-      delete: yes
-    delegate_to: "{{ inventory_hostname }}"
+#   - name: Make a copy of the usual data dir
+#     become: yes
+#     synchronize:
+#       src: /opt/queerhaus/nextcloud/data/app
+#       dest: /opt/queerhaus/nextcloud/data_copy/
+#       delete: yes
+#     delegate_to: "{{ inventory_hostname }}"
 
-  - name: Make a copy of the volume data dir
-    become: yes
-    synchronize:
-      src: "{{ nextcloud_config.app_mountpoint }}"
-      dest: /opt/queerhaus/nextcloud/data_copy/
-      delete: yes
-    delegate_to: "{{ inventory_hostname }}"
+#   - name: Make a copy of the volume data dir
+#     become: yes
+#     synchronize:
+#       src: "{{ nextcloud_config.app_mountpoint }}"
+#       dest: /opt/queerhaus/nextcloud/data_copy/
+#       delete: yes
+#     delegate_to: "{{ inventory_hostname }}"
 
-  - name: Start all containers again
-    command:
-      cmd: docker-compose up -d
-      chdir: /opt/queerhaus/nextcloud
+#   - name: Start all containers again
+#     command:
+#       cmd: docker-compose up -d
+#       chdir: /opt/queerhaus/nextcloud
 
-  - name: Change ownership of data dir
-    become: yes
-    file:
-      path: /opt/queerhaus/nextcloud/data_copy/
-      state: directory
-      recurse: yes
-      owner: "{{ ansible_user }}"
-      group: queers
+#   - name: Change ownership of data dir
+#     become: yes
+#     file:
+#       path: /opt/queerhaus/nextcloud/data_copy/
+#       state: directory
+#       recurse: yes
+#       owner: "{{ ansible_user }}"
+#       group: queers
 
-  - name: Download the data
-    synchronize:
-      mode: pull
-      src: /opt/queerhaus/nextcloud/data_copy/
-      dest: backup/nextcloud/
-      delete: yes
+#   - name: Download the data
+#     synchronize:
+#       mode: pull
+#       src: /opt/queerhaus/nextcloud/data_copy/
+#       dest: backup/nextcloud/
+#       delete: yes
