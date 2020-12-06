@@ -82,6 +82,7 @@
   user:
     name: "{{ item.name }}"
     password: "{{ item.sudo_password }}"
+    # TODO maybe freeze queer group to a known number
     groups: [queers,sudo,docker]
     state: present
     shell: /usr/bin/zsh

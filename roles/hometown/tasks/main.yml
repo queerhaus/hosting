@@ -46,7 +46,17 @@
     cmd: docker-compose pull
     chdir: /opt/queerhaus/hometown
 
+- name: Run migrations
+  command:
+    cmd: docker-compose run --rm town-web rails db:migrate
+    chdir: /opt/queerhaus/hometown
+
 - name: Start up containers
   command: 
     cmd: docker-compose up -d --remove-orphans
+    chdir: /opt/queerhaus/hometown
+
+- name: Clear caches
+  command:
+    cmd: docker-compose run --rm town-web bin/tootctl cache clear
     chdir: /opt/queerhaus/hometown
