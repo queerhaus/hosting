@@ -1,6 +1,7 @@
 # This is only a set of shortcuts, you can also run the ansible-playbook command directly
-depend:
-	ansible-galaxy install -r requirements.yml
+update:
+	ansible-galaxy role install -r requirements.yml
+	ansible-galaxy collection install -r requirements.yml
 
 stage: staging
 stage-common: staging-common

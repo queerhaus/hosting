@@ -1,8 +1,13 @@
 ---
+# This file defines what roles and collections to install from Ansible Galaxy
+# https://docs.ansible.com/ansible/latest/user_guide/collections_using.html#install-multiple-collections-with-a-requirements-file
+
+# These are installed in the current folder and committed to git,
+# so that we can track changes and verify they do not do anything harmful.
+# https://www.jeffgeerling.com/blog/2020/ansible-best-practices-using-project-local-collections-and-roles
+
 roles:
-  # Install a role from Ansible Galaxy.
   - name: geerlingguy.swap
 
 collections:
-  # Install a collection from Ansible Galaxy.
   - name: community.general
