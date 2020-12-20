@@ -3,14 +3,19 @@ update:
 	ansible-galaxy role install -r requirements.yml
 	ansible-galaxy collection install -r requirements.yml
 
-stage: staging
-stage-common: staging-common
 staging: 
 	ansible-playbook -i hosts/staging site.yml -D -v -K
+staging-traefik:
+	ansible-playbook -i hosts/staging site.yml -D -v -t traefik
 staging-common:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
+staging-hometown: 
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t hometown
+
 production:
 	ansible-playbook -i hosts/production site.yml -D -v -K
+production-hometown:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t hometown
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C
@@ -31,6 +36,8 @@ deploy-hometown-production:
 
 restart-staging:
 	ansible-playbook -i hosts/staging restart.yml -D -v
+restart-common-staging:
+	ansible-playbook -i hosts/staging restart.yml -D -v -t common
 restart-codimd-staging:
 	ansible-playbook -i hosts/staging restart.yml -D -v -t codimd
 restart-nextcloud-staging:

@@ -47,10 +47,17 @@ services:
       - town-db
       - town-redis
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.town-web.rule=Host(`${TOP_DOMAIN}`)"
-      - "traefik.http.routers.town-web.entrypoints=websecure"
-      - "traefik.http.routers.town-web.tls.certresolver=letsencrypt"
+      traefik.enable: true
+      traefik.http.routers.town-web.rule: Host(`${TOP_DOMAIN}`,`queer.house`)
+      traefik.http.routers.town-web.entrypoints: websecure
+      traefik.http.routers.town-web.tls.certresolver: letsencrypt
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: ${TOP_DOMAIN}
+      traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
+      traefik.http.middlewares.town-redirect.redirectregex.replacement: ${TOP_DOMAIN}$${1}
+      traefik.http.middlewares.town-redirect.redirectregex.permanent: true
+      traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker
     volumes:
       - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
     networks:

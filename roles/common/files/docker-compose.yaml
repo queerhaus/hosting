@@ -32,23 +32,23 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/letsencrypt:/letsencrypt
     labels:
-      - "traefik.enable=true"
-      # Dashboard
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.middlewares=dashboardauth,error-pages"
-      - "traefik.http.middlewares.dashboardauth.basicauth.users=${TRAEFIK_USERNAME}:${TRAEFIK_PASSWORD}" 
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: Host(`${TRAEFIK_DOMAIN}`)
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.tls.certresolver: letsencrypt
+      traefik.http.routers.traefik.entrypoints: websecure
+      traefik.http.routers.traefik.middlewares: dashboardauth
+      traefik.http.middlewares.dashboardauth.basicauth.users: ${TRAEFIK_USERNAME}:${TRAEFIK_PASSWORD}
     networks:
       - external_network
 
-  caddy:
+  # Global error page inspired from this: https://imandrea.me/blog/traefik-custom-404/
+  error-pages:
     image: caddy:2-alpine
     restart: unless-stopped
     volumes:
       #- $PWD/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy:/srv
+      - ./caddy:/usr/share/caddy
       - ./data/caddy/data:/data
       - ./data/caddy/config:/config
     labels:
@@ -56,12 +56,13 @@ services:
       traefik.http.routers.error-router.rule: HostRegexp(`{host:.+}`)
       traefik.http.routers.error-router.priority: 1
       traefik.http.routers.error-router.entrypoints: websecure
-      traefik.http.routers.error-router.middlewares: error-pages
-      traefik.http.middlewares.error-pages.errors.status: 400-599
-      traefik.http.middlewares.error-pages.errors.service: error-pages-service
-      traefik.http.middlewares.error-pages.errors.query: /error.html
+      traefik.http.routers.error-router.tls.certresolver: letsencrypt
+      traefik.http.routers.error-router.middlewares: error-middleware
+      traefik.http.middlewares.error-middleware.errors.status: 400-599
+      traefik.http.middlewares.error-middleware.errors.service: error-pages
+      traefik.http.middlewares.error-middleware.errors.query: /index.html
       #traefik.http.middlewares.error-pages.errors.query: /{status}.html
-      traefik.http.services.error-pages-service.loadbalancer.server.port: 80
+      traefik.http.services.error-pages.loadbalancer.server.port: 80
     networks:
       - external_network
       - internal_network

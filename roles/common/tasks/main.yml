@@ -88,6 +88,7 @@
     mode: "u=rwx,g=rwx,o=rx,g+s"
 
 - name: Copy docker compose
+  tags: traefik
   copy:
     src: docker-compose.yaml
     dest: /opt/queerhaus/common/docker-compose.yaml
@@ -95,6 +96,7 @@
     mode: "u=rw,g=rw,o=r"
 
 - name: Template env file
+  tags: traefik
   template:
     src: .env
     dest: /opt/queerhaus/common/.env
@@ -102,6 +104,7 @@
     mode: "u=rw,g=rw,o=r"
 
 - name: Copy caddy site
+  tags: traefik
   copy:
     src: caddy/
     dest: /opt/queerhaus/common/caddy/
@@ -109,11 +112,13 @@
     mode: "u=rw,g=rw,o=r"
 
 - name: Pull containers images
+  tags: traefik
   command: 
     cmd: docker-compose pull
     chdir: /opt/queerhaus/common
 
 - name: Start up containers
+  tags: traefik
   command: 
     cmd: docker-compose up -d --remove-orphans
     chdir: /opt/queerhaus/common
