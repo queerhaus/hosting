@@ -167,6 +167,13 @@
   notify:
     - Restore iptables
 
+# https://askubuntu.com/questions/1239503/ubuntu-20-04-and-20-10-etc-securetty-no-such-file-or-directory
+- name: Silence the /etc/securetty warning removing "nullok_secure"
+  become: true
+  copy:
+    src: etc/pam.d/common-auth
+    dest: /etc/pam.d/common-auth
+
 # - name: UFW - Allow SSH connections
 #   ufw:
 #     rule: allow
