@@ -1,5 +1,5 @@
 # This is only a set of shortcuts, you can also run the ansible-playbook command directly
-update:
+galaxy:
 	ansible-galaxy role install -r requirements.yml
 	ansible-galaxy collection install -r requirements.yml
 
