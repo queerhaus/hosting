@@ -8,7 +8,7 @@
 
 - name: Create nextcloud directory
   file:
-    path: /opt/queerhaus/nextcloud
+    path: "{{ setups.nextcloud.run_dir }}"
     state: directory
     group: queers
     mode: "u=rwx,g=rwx,o=rx,g+s"
@@ -20,26 +20,28 @@
 #     group: queers
 #     mode: "u=rwx,g=rwx,o=rx"
 
-- name: Copy docker compose
-  copy:
+- name: Template docker compose
+  template:
     src: docker-compose.yaml
-    dest: /opt/queerhaus/nextcloud/docker-compose.yaml
+    dest: "{{ setups.nextcloud.run_dir }}/docker-compose.yaml"
     group: queers
     mode: "u=rw,g=rw,o=r"
 
-- name: Template env file
-  template:
-    src: .env
-    dest: /opt/queerhaus/nextcloud/.env
-    group: queers
-    mode: "u=rw,g=rw,o=r"
+- name: Remove env file
+  file:
+    path: "{{ setups.nextcloud.run_dir }}/.env"
+    state: absent
 
 - name: Pull containers images (this will take time)
   command: 
     cmd: docker-compose pull
-    chdir: /opt/queerhaus/nextcloud
+    chdir: "{{ setups.nextcloud.run_dir }}"
+  register: pull_result
+  changed_when: pull_result.stderr.find('downloaded newer image') != -1
 
 - name: Start up containers (this can be slow)
   command: 
     cmd: docker-compose up -d --remove-orphans
-    chdir: /opt/queerhaus/nextcloud
+    chdir: "{{ setups.nextcloud.run_dir }}"
+  register: up_result
+  changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1

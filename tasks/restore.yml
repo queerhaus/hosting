@@ -1,0 +1,89 @@
+---
+
+- name: List all local backups for service
+  delegate_to: localhost
+  find:
+    paths: "backup"
+    patterns: '{{ service }}_*.tar.xz'
+  register: backups
+
+- name: Set latest local backup object
+  set_fact:
+    latest_backup_object: "{{ backups.files | sort(attribute='mtime',reverse=true) | first }}"
+
+- name: Set latest local backup filename
+  set_fact:
+    latest_backup: "{{ latest_backup_object.path | basename }}"
+
+- name: Make sure backup dir exists
+  become: yes
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: root
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: Delete old restore dir
+  become: yes
+  file:
+    path: "{{ restore_dir }}"
+    state: absent
+
+- name: Make sure restore dir exists
+  become: yes
+  file:
+    path: "{{ restore_dir }}"
+    state: directory
+    owner: root
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: Upload the backup file to backup dir
+  synchronize:
+    src: "backup/{{ latest_backup }}"
+    dest: "{{ backup_dir }}"
+
+- name: Extract the backup into restore dir
+  become: yes
+  command:
+    cmd: tar -xf {{ backup_dir }}/{{ latest_backup }}
+    chdir: "{{ restore_dir }}"
+
+# TODO set file permissions
+
+- name: Stop all containers
+  command:
+    cmd: docker-compose stop
+    chdir: "{{ run_dir }}"
+
+- name: Archive the live data before we replace it
+  become: yes
+  command:
+    cmd: tar -cf {{ backup_file }}.tar .
+    chdir: "{{ data_dir }}"
+
+- name: Replace the live data with restored backup
+  become: yes
+  synchronize:
+    src: "{{ restore_dir }}/"
+    dest: "{{ data_dir }}/"
+    delete: yes
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Start all containers again for minimum downtime
+  command:
+    cmd: docker-compose up -d
+    chdir: "{{ run_dir }}"
+
+- name: Change owner of backed up live archive
+  become: yes
+  file:
+    path: "{{ backup_file }}.tar"
+    owner: "{{ ansible_user }}"
+    group: queers
+
+- name: Compress the backed up live archive
+  command:
+    cmd: xz -4 -T0 {{ backup_file }}.tar
+    chdir: "{{ data_dir }}"

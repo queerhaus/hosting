@@ -22,12 +22,15 @@ staging-dry:
 production-dry:
 	ansible-playbook -i hosts/production site.yml -D -v -K -C
 
-download-staging:
-	ansible-playbook -i hosts/staging download.yml -K
-download-production:
-	ansible-playbook -i hosts/production download.yml -K
-download-hometown:
-	ansible-playbook -i hosts/production download.yml -K -t hometown
+backup-staging:
+	ansible-playbook -i hosts/staging backup-download.yml -K
+backup-production:
+	ansible-playbook -i hosts/production backup-download.yml -K
+backup-hometown:
+	ansible-playbook -i hosts/production backup-download.yml -K -t hometown
+
+restore-staging-codimd:
+	ansible-playbook -i hosts/staging backup-restore.yml -K -v -D -t codimd
 
 deploy-hometown-staging:
 	ansible-playbook -i hosts/staging deploy.yml -D -v -t hometown

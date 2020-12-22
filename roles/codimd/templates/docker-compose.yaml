@@ -27,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=codimdpass
       - POSTGRES_DB=codimd
     volumes:
-      - ./data/codi/postgres:/var/lib/postgresql/data
+      - {{ setups.codimd.data_dir }}/postgres:/var/lib/postgresql/data
     networks:
       - internal_network
 
@@ -41,13 +41,13 @@ services:
     #  - /tmp:size=512K
     #  - /codimd/tmp:size=1M
     volumes:
-      - ./data/codi/uploads:/codimd/public/uploads
+      - {{ setups.codimd.data_dir }}/uploads:/codimd/public/uploads
     environment:
       CMD_DB_URL: postgres://codimd:codimdpass@codi-db:5432/codimd
       CMD_FORBIDDEN_NOTE_IDS: robots.txt
       CMD_IMAGE_UPLOAD_TYPE: filesystem
       CMD_PORT: 3000
-      CMD_DOMAIN: codimd.${TOP_DOMAIN}
+      CMD_DOMAIN: codimd.{{ top_domain }}
       CMD_PROTOCOL_USESSL: "true"
       CMD_USECDN: "false"
       CMD_URL_ADDPORT: "false"
@@ -59,7 +59,7 @@ services:
       - codi-db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.codi-web.rule=Host(`codimd.${TOP_DOMAIN}`)"
+      - "traefik.http.routers.codi-web.rule=Host(`codimd.{{ top_domain }}`)"
       - "traefik.http.routers.codi-web.entrypoints=websecure"
       - "traefik.http.routers.codi-web.tls.certresolver=letsencrypt"
       - "traefik.http.services.codi-web.loadbalancer.server.port=3000"

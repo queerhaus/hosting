@@ -1,0 +1,52 @@
+---
+
+# - name: Set variables
+#   set_fact:
+#     run_dir: "{{ lookup('vars', 'setups.' + service + '.run_dir') }}"
+#     data_dir: "{{ lookup('vars', 'setups.' + service + '.data_dir') }}"
+#     backup_dir: "{{ lookup('vars', 'setups.' + service + '.backup_dir') }}"
+#     backup_file: "{{ backup_dir }}/{{ service }}_{{ ansible_date_time.date }}.tar.xz"
+
+- name: Make sure backup dir exists
+  become: yes
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: root
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx"
+
+- name: Stop all containers
+  command:
+    cmd: docker-compose stop
+    chdir: "{{ run_dir }}"
+
+- name: Archive the data
+  become: yes
+  command:
+    cmd: tar -cf {{ backup_file }}.tar .
+    chdir: "{{ data_dir }}"
+    warn: false
+
+- name: Start all containers again for minimum downtime
+  command:
+    cmd: docker-compose up -d
+    chdir: "{{ run_dir }}"
+
+- name: Change owner of archive
+  become: yes
+  file:
+    path: "{{ backup_file }}.tar"
+    owner: "{{ ansible_user }}"
+    group: queers
+
+- name: Compress the archive
+  command:
+    cmd: xz -4 -T0 {{ backup_file }}.tar
+    chdir: "{{ data_dir }}"
+
+- name: Download the archive
+  synchronize:
+    mode: pull
+    src: "{{ backup_file }}.tar.xz"
+    dest: "backup/"

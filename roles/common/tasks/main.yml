@@ -12,26 +12,57 @@
     name: de_DE.UTF-8
     state: present
 
-- name: Install helpful packages
+- name: Install required packages
   become: yes
   apt: 
     name:
-      - tig
-      - htop
+      - docker-compose
+      - docker.io
       - glances
-      - tmux
+      - htop
       - mosh
-    state: latest 
+      - tig
+      - tmux
+    state: latest
     update_cache: yes
 
-- name: Install required system packages
-  become: true
-  apt: 
-    name:
-      - docker.io
-      - docker-compose
-    state: latest 
-    update_cache: no
+# If we one day need a newer version of docker this is how to install it
+# - name: Uninstall old docker
+#   become: true
+#   apt: 
+#     name:
+#       - docker.io
+#     state: absent 
+#     update_cache: no
+# - name: Add Docker apt key
+#   become: yes
+#   apt_key:
+#     url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+#     id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+#     state: present
+# - name: Add Docker repository
+#   become: yes
+#   apt_repository:
+#     filename: docker
+#     repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+#     state: present
+#     update_cache: true
+# - name: Install docker
+#   become: true
+#   apt: 
+#     name:
+#       - docker-ce
+#       - docker-compose
+#     state: latest 
+#     update_cache: no
+
+- name: Install custom docker config
+  become: yes
+  copy:
+    src: etc/docker/daemon.json
+    dest: /etc/docker/daemon.json
+  notify:
+    - Restart docker
 
 - name: Add users to docker group
   become: true
@@ -78,47 +109,3 @@
     state: directory
     group: queers
     mode: "u=rwx,g=rwx,o=rx,g+s"
-
-- name: Create queerhaus/common directory
-  become: true
-  file:
-    path: /opt/queerhaus/common
-    state: directory
-    group: queers
-    mode: "u=rwx,g=rwx,o=rx,g+s"
-
-- name: Copy docker compose
-  tags: traefik
-  copy:
-    src: docker-compose.yaml
-    dest: /opt/queerhaus/common/docker-compose.yaml
-    group: queers
-    mode: "u=rw,g=rw,o=r"
-
-- name: Template env file
-  tags: traefik
-  template:
-    src: .env
-    dest: /opt/queerhaus/common/.env
-    group: queers
-    mode: "u=rw,g=rw,o=r"
-
-- name: Copy caddy site
-  tags: traefik
-  copy:
-    src: caddy/
-    dest: /opt/queerhaus/common/caddy/
-    group: queers
-    mode: "u=rw,g=rw,o=r"
-
-- name: Pull containers images
-  tags: traefik
-  command: 
-    cmd: docker-compose pull
-    chdir: /opt/queerhaus/common
-
-- name: Start up containers
-  tags: traefik
-  command: 
-    cmd: docker-compose up -d --remove-orphans
-    chdir: /opt/queerhaus/common

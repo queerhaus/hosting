@@ -1,0 +1,47 @@
+---
+
+- name: Copy traefik data to localhost
+  hosts: 
+    - hometown_host
+    - collab_host
+  tags: traefik
+  vars:
+    run_dir: "{{ setups.traefik.run_dir }}"
+    data_dir: "{{ setups.traefik.data_dir }}"
+    backup_dir: "{{ setups.traefik.backup_dir }}"
+    backup_file: "{{ setups.traefik.backup_dir }}/traefik_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}"
+  tasks:
+    - include_tasks: tasks/backup.yml
+
+- name: Copy hometown data to localhost
+  hosts: hometown_host
+  tags: hometown
+  vars:
+    run_dir: "{{ setups.hometown.run_dir }}"
+    data_dir: "{{ setups.hometown.data_dir }}"
+    backup_dir: "{{ setups.hometown.backup_dir }}"
+    backup_file: "{{ setups.hometown.backup_dir }}/hometown_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}"
+  tasks:
+    - include_tasks: tasks/backup.yml
+
+- name: Copy codimd data to localhost
+  hosts: collab_host
+  tags: codimd
+  vars:
+    run_dir: "{{ setups.codimd.run_dir }}"
+    data_dir: "{{ setups.codimd.data_dir }}"
+    backup_dir: "{{ setups.codimd.backup_dir }}"
+    backup_file: "{{ setups.codimd.backup_dir }}/codimd_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}"
+  tasks:
+    - include_tasks: tasks/backup.yml
+
+- name: Copy nextcloud data to localhost
+  hosts: collab_host
+  tags: nextcloud
+  vars:
+    run_dir: "{{ setups.nextcloud.run_dir }}"
+    data_dir: "{{ setups.nextcloud.data_dir }}"
+    backup_dir: "{{ setups.nextcloud.backup_dir }}"
+    backup_file: "{{ setups.nextcloud.backup_dir }}/nextcloud_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}"
+  tasks:
+    - include_tasks: tasks/backup.yml

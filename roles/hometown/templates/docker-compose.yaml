@@ -17,7 +17,7 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
     volumes:
-      - ./data/hometown/postgres:/var/lib/postgresql/data
+      - {{ setups.hometown.data_dir }}/postgres:/var/lib/postgresql/data
     environment:
       # Disable authentication  https://www.postgresql.org/docs/current/auth-trust.html
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -30,12 +30,12 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
     volumes:
-      - ./data/hometown/redis:/data
+      - {{ setups.hometown.data_dir }}/redis:/data
     networks:
       - internal_network
 
   town-web:
-    image: ${HOMETOWN_DOCKER_IMAGE}
+    image: {{ setups.hometown.config.docker_image }}
     restart: unless-stopped
     env_file: .env.hometown
     command: bash -c "rm -f /mastodon/tmp/pids/server.pid; bundle exec rails s -p 3000"
@@ -48,24 +48,24 @@ services:
       - town-redis
     labels:
       traefik.enable: true
-      traefik.http.routers.town-web.rule: Host(`${TOP_DOMAIN}`,`queer.house`)
+      traefik.http.routers.town-web.rule: Host(`{{ top_domain }}`,`queer.house`)
       traefik.http.routers.town-web.entrypoints: websecure
       traefik.http.routers.town-web.tls.certresolver: letsencrypt
       traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
       traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
-      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: ${TOP_DOMAIN}
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: {{ top_domain }}
       traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
-      traefik.http.middlewares.town-redirect.redirectregex.replacement: ${TOP_DOMAIN}$${1}
+      traefik.http.middlewares.town-redirect.redirectregex.replacement: {{ top_domain }}$${1}
       traefik.http.middlewares.town-redirect.redirectregex.permanent: true
       traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker
     volumes:
-      - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
+      - {{ setups.hometown.data_dir }}/public/system:/mastodon/public/system
     networks:
       - external_network
       - internal_network
 
   town-streaming:
-    image: ${HOMETOWN_DOCKER_IMAGE}
+    image: {{ setups.hometown.config.docker_image }}
     restart: unless-stopped
     env_file: .env.hometown
     command: node ./streaming
@@ -78,7 +78,7 @@ services:
       - town-redis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.town-streaming.rule=(Host(`${TOP_DOMAIN}`) && PathPrefix(`/api/v1/streaming`))"
+      - "traefik.http.routers.town-streaming.rule=(Host(`{{ top_domain }}`) && PathPrefix(`/api/v1/streaming`))"
       - "traefik.http.routers.town-streaming.entrypoints=websecure"
       - "traefik.http.routers.town-streaming.tls.certresolver=letsencrypt"
       - "traefik.http.services.town-streaming.loadbalancer.server.port=4000"
@@ -87,7 +87,7 @@ services:
       - internal_network
 
   town-sidekiq:
-    image: ${HOMETOWN_DOCKER_IMAGE}
+    image: {{ setups.hometown.config.docker_image }}
     restart: unless-stopped
     env_file: .env.hometown
     command: bundle exec sidekiq
@@ -95,7 +95,7 @@ services:
       - town-db
       - town-redis
     volumes:
-      - ${HOMETOWN_SYSTEM_MOUNTPOINT:-./data/hometown/public/system}:/mastodon/public/system
+      - {{ setups.hometown.data_dir }}/public/system:/mastodon/public/system
     networks:
       - external_network
       - internal_network

@@ -1,8 +1,8 @@
 ---
 
-- name: set up ssh service and users
+- name: Set up SSH service and users
   hosts: all
-  tags: common
+  tags: basic
   gather_facts: false
   roles:
     - basic
@@ -13,19 +13,21 @@
   roles:
     - floating_ip
 
-- name: install docker and traefik
+- name: Install docker and traefik
   hosts: all
-  tags: common
+  tags: 
+    - common
   roles:
     - common
+    - traefik
 
-- name: set up hometown host
+- name: Set up hometown host
   hosts: hometown_host
   tags: hometown
   roles:
     - hometown
 
-- name: set up collab host
+- name: Set up collab host
   hosts: collab_host
   tags: 
     - collab

@@ -1,0 +1,85 @@
+---
+# WARNING THESE UPLOADS ARE DESTRUCTIVE !!!
+# They will overwrite and delete files on the hosts!
+
+- name: Restore traefik backup
+  hosts: 
+    - hometown_host
+    - collab_host
+  tags: traefik
+  vars:
+    service: traefik
+    run_dir: "{{ setups.traefik.run_dir }}"
+    data_dir: "{{ setups.traefik.data_dir }}"
+    backup_dir: "{{ setups.traefik.backup_dir }}"
+    restore_dir: "{{ setups.traefik.restore_dir }}"
+    backup_file: "{{ setups.traefik.backup_dir }}/traefik_{{ ansible_date_time.iso8601_basic_short }}"
+  tasks:
+    - include_tasks: tasks/restore.yml
+
+# - name: Upload hometown data files from localhost
+#   hosts: hometown_host
+#   tags: hometown
+#   tasks:
+
+- name: Restore codimd backup from localhost
+  hosts: collab_host
+  tags: 
+    - codimd
+    - collab
+  vars:
+    service: codimd
+    run_dir: "{{ setups.codimd.run_dir }}"
+    data_dir: "{{ setups.codimd.data_dir }}"
+    backup_dir: "{{ setups.codimd.backup_dir }}"
+    restore_dir: "{{ setups.codimd.restore_dir }}"
+    backup_file: "{{ setups.codimd.backup_dir }}/codimd_{{ ansible_date_time.iso8601_basic_short }}_restore"
+  tasks:
+    - include_tasks: tasks/restore.yml
+
+- name: Upload nextcloud data files from localhost
+  hosts: collab_host
+  tags: 
+    - nextcloud
+    - collab
+  tasks:
+  - name: Upload the data
+    synchronize:
+      src: backup/nextcloud/
+      dest: /opt/queerhaus/nextcloud/data_upload/
+      delete: yes
+
+  - name: Change ownership of data
+    become: yes
+    file:
+      path: /opt/queerhaus/nextcloud/data_upload/
+      state: directory
+      recurse: yes
+      owner: "33"
+      group: queers
+
+  - name: Stop all containers
+    command:
+      cmd: docker-compose down
+      chdir: /opt/queerhaus/nextcloud
+
+  - name: Backup the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/nextcloud/data/
+      dest: /opt/queerhaus/nextcloud/data_backup/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Replace the live data
+    become: yes
+    synchronize:
+      src: /opt/queerhaus/nextcloud/data_upload/
+      dest: /opt/queerhaus/nextcloud/data/
+      delete: yes
+    delegate_to: "{{ inventory_hostname }}"
+
+  - name: Start all containers again
+    command:
+      cmd: docker-compose up -d
+      chdir: /opt/queerhaus/nextcloud

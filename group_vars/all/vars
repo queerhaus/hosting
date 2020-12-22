@@ -10,10 +10,6 @@ smtp_domain: queer.haus
 smtp_user: "{{ vault_smtp_user }}"
 smtp_pass: "{{ vault_smtp_pass }}"
 
-traefik_admin_password: "{{ vault_traefik_admin_password }}"
-
-onlyoffice_secret: "{{ vault_onlyoffice_secret }}"
-
 queer_users:
   - name: queeradmin
     ssh_public_keys:

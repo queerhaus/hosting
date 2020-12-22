@@ -16,12 +16,12 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
     volumes:
-      - ./data/nextcloud/db:/var/lib/mysql
+      - {{ setups.nextcloud.data_dir }}/nextcloud/db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_MYSQL_ROOT_PASSWORD}
-      - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+      MYSQL_ROOT_PASSWORD: "{{ setups.nextcloud.config.mysql_root_password }}"
+      MYSQL_PASSWORD: "{{ setups.nextcloud.config.mysql_password }}"
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
     networks:
       - internal_network
 
@@ -31,19 +31,19 @@ services:
       - nextcloud-db
       - onlyoffice-documentserver
     volumes:
-      - ${NEXTCLOUD_MOUNTPOINT:-./data/nextcloud/app}:/var/www/html
+      - {{ setups.nextcloud.data_dir }}/nextcloud/app:/var/www/html
     environment:
       MYSQL_HOST: nextcloud-db
       MYSQL_DATABASE: nextcloud
       MYSQL_USER: nextcloud
-      MYSQL_PASSWORD: ${NEXTCLOUD_MYSQL_PASSWORD}
+      MYSQL_PASSWORD: "{{ setups.nextcloud.config.mysql_password }}"
       APACHE_DISABLE_REWRITE_IP: 1
       TRUSTED_PROXIES: traefik
-      NEXTCLOUD_TRUSTED_DOMAINS: cloud.${TOP_DOMAIN}
+      NEXTCLOUD_TRUSTED_DOMAINS: cloud.{{ top_domain }}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextcloud.rule=Host(`cloud.${TOP_DOMAIN}`)"
+      - "traefik.http.routers.nextcloud.rule=Host(`cloud.{{ top_domain }}`)"
       - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.nextcloud-headers.headers.stsseconds=15552000"
@@ -71,20 +71,20 @@ services:
       - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
       # Uncomment strings below to enable the JSON Web Token validation.
       - JWT_ENABLED=true
-      - JWT_SECRET=${ONLYOFFICE_SECRET}
+      - JWT_SECRET={{ setups.nextcloud.config.onlyoffice_secret }}
       #- JWT_HEADER=Authorization
       #- JWT_IN_BODY=true
     stdin_open: true
     restart: unless-stopped
     volumes:
-       - ./data/onlyoffice/data:/var/www/onlyoffice/Data
-       - ./data/onlyoffice/logs:/var/log/onlyoffice
-       - ./data/onlyoffice/cache:/var/lib/onlyoffice/documentserver/App_Data/cache/files
-       - ./data/onlyoffice/public:/var/www/onlyoffice/documentserver-example/public/files
-       - ./data/onlyoffice/fonts:/usr/share/fonts
+       - {{ setups.nextcloud.data_dir }}/onlyoffice/data:/var/www/onlyoffice/Data
+       - {{ setups.nextcloud.data_dir }}/onlyoffice/logs:/var/log/onlyoffice
+       - {{ setups.nextcloud.data_dir }}/onlyoffice/cache:/var/lib/onlyoffice/documentserver/App_Data/cache/files
+       - {{ setups.nextcloud.data_dir }}/onlyoffice/public:/var/www/onlyoffice/documentserver-example/public/files
+       - {{ setups.nextcloud.data_dir }}/onlyoffice/fonts:/usr/share/fonts
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.onlyoffice.rule=Host(`office.${TOP_DOMAIN}`)"
+      - "traefik.http.routers.onlyoffice.rule=Host(`office.{{ top_domain }}`)"
       - "traefik.http.routers.onlyoffice.entrypoints=websecure"
       - "traefik.http.routers.onlyoffice.tls.certresolver=letsencrypt"
       # https://community.traefik.io/t/traefik-2-0-and-onlyoffice-not-work-work-correctly-in-v-2/3286/3
@@ -112,6 +112,6 @@ services:
     expose:
       - '5432'
     volumes:
-      - ./data/onlyoffice/postgres:/var/lib/postgresql
+      - {{ setups.nextcloud.data_dir }}/onlyoffice/postgres:/var/lib/postgresql
     networks:
       - internal_network

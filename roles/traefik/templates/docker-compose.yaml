@@ -23,22 +23,22 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.email=$TRAEFIK_ADMIN_EMAIL"
+      - "--certificatesresolvers.letsencrypt.acme.email={{ setups.traefik.config.email }}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/letsencrypt:/letsencrypt
+      - {{ setups.traefik.data_dir }}/letsencrypt:/letsencrypt
     labels:
       traefik.enable: true
-      traefik.http.routers.traefik.rule: Host(`${TRAEFIK_DOMAIN}`)
+      traefik.http.routers.traefik.rule: Host(`{{ inventory_hostname }}`)
       traefik.http.routers.traefik.service: api@internal
       traefik.http.routers.traefik.tls.certresolver: letsencrypt
       traefik.http.routers.traefik.entrypoints: websecure
       traefik.http.routers.traefik.middlewares: dashboardauth
-      traefik.http.middlewares.dashboardauth.basicauth.users: ${TRAEFIK_USERNAME}:${TRAEFIK_PASSWORD}
+      traefik.http.middlewares.dashboardauth.basicauth.users: ${traefik_basic_auth}
     networks:
       - external_network
 
@@ -49,8 +49,8 @@ services:
     volumes:
       #- $PWD/Caddyfile:/etc/caddy/Caddyfile
       - ./caddy:/usr/share/caddy
-      - ./data/caddy/data:/data
-      - ./data/caddy/config:/config
+      - {{ setups.traefik.data_dir }}/caddy/data:/data
+      - {{ setups.traefik.data_dir }}/caddy/config:/config
     labels:
       traefik.enable: true
       traefik.http.routers.error-router.rule: HostRegexp(`{host:.+}`)

@@ -1,0 +1,48 @@
+---
+
+- name: Create queerhaus/traefik directory
+  become: true
+  file:
+    path: "{{ setups.traefik.run_dir }}"
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Template docker-compose file
+  tags: traefik
+  template:
+    src: docker-compose.yaml
+    dest: "{{ setups.traefik.run_dir }}/docker-compose.yaml"
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Template env file
+  template:
+    src: .env
+    dest: "{{ setups.traefik.run_dir }}/.env"
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Copy caddy site
+  tags: traefik
+  copy:
+    src: caddy/
+    dest: "{{ setups.traefik.run_dir }}/caddy/"
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Pull containers images
+  tags: traefik
+  command:
+    cmd: docker-compose pull
+    chdir: "{{ setups.traefik.run_dir }}"
+  register: pull_result
+  changed_when: pull_result.stderr.find('downloaded newer image') != -1
+
+- name: Start up containers
+  tags: traefik
+  command:
+    cmd: docker-compose up -d --remove-orphans
+    chdir: "{{ setups.traefik.run_dir }}"
+  register: up_result
+  changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1
