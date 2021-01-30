@@ -1,0 +1,29 @@
+---
+
+- name: Create directory
+  file:
+    path: "{{ setups.collective.run_dir }}"
+    state: directory
+    group: queers
+    mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Template docker-dompose file
+  template:
+    src: docker-compose.yaml
+    dest: "{{ setups.collective.run_dir }}/docker-compose.yaml"
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
+- name: Pull containers images
+  command: 
+    cmd: docker-compose pull
+    chdir: "{{ setups.collective.run_dir }}"
+  register: pull_result
+  changed_when: pull_result.stderr.find('downloaded newer image') != -1
+
+- name: Start up containers
+  command: 
+    cmd: docker-compose up -d --remove-orphans
+    chdir: "{{ setups.collective.run_dir }}"
+  register: up_result
+  changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1

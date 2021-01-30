@@ -109,3 +109,37 @@
     state: directory
     group: queers
     mode: "u=rwx,g=rwx,o=rx,g+s"
+
+- name: Set up deploy user
+  become: true
+  user:
+    name: deploy
+    groups: [queers,docker]
+    state: present
+    shell: /usr/bin/zsh
+
+- name: Create .docker directory for deploy user
+  become: true
+  file:
+    path: /home/deploy/.docker
+    state: directory
+    owner: deploy
+    group: deploy
+
+- name: Create docker config with auth token for deploy
+  become: true
+  template:
+    src: docker-config.json
+    dest: /home/deploy/.docker/config.json
+    owner: deploy
+    group: deploy
+  with_items: [ { github_personal_access_token: "{{ deploy_user_github_token }}" } ]
+
+- name: Set up deploy user authorized key - collective
+  become: true
+  authorized_key:
+    user: deploy
+    state: present
+    key: "{{ setups.collective.deploy.public_key }}"
+    key_options: 'command="{{ setups.collective.deploy.command }}"'
+

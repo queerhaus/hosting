@@ -26,6 +26,7 @@
   tags: hometown
   roles:
     - hometown
+    - collective
 
 - name: Set up collab host
   hosts: collab_host

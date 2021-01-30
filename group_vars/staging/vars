@@ -11,6 +11,16 @@ setups:
       username: admin
       password: "{{ vault_traefik_admin_password }}"
       email: queerhaus+stage@protonmail.com
+  collective:
+    run_dir: /opt/queerhaus/collective
+    data_dir: /opt/queerhaus/collective/data
+    backup_dir: /opt/queerhaus/collective/backup
+    restore_dir: /opt/queerhaus/collective/restore
+    deploy:
+      command: "set -x; cd /opt/queerhaus/collective && docker-compose pull && docker-compose up -d"
+      public_key: "{{ vault_collective.deploy_public_key}}"
+    config:
+      docker_image: docker.pkg.github.com/queerhaus/collective/collective:main
   hometown:
     run_dir: /opt/queerhaus/hometown
     data_dir: /opt/queerhaus/hometown/data

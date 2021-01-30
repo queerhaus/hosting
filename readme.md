@@ -69,6 +69,8 @@ To decrypt these values you need the master password that was used to encrypt th
 
 Once BitWarden is unlocked and the password retrieved, all encrypted values will automatically be decrypted as you run Ansible commands.
 
+To edit an encrypted file in place you can use this command: `ansible-vault edit group_vars/all/vault`
+
 
 ## Add a new linux user
 To be able to run any of these commands you need to have access to the servers. We do this with a personal user that has your SSH public key. All linux users that exist on our servers are defined in `group_vars/all/vars`.
@@ -105,7 +107,7 @@ Give it a name so you know what it is used for, and select the scope "read:packa
 
 Then run this token through the Ansible Vault crypto like this:
 ```bash
-ansible-vault encrypt_string "token_here" --name github_personal_access_token
+ansible-vault encrypt_string "username:token" --name github_personal_access_token
 ```
 
 ### Create your user

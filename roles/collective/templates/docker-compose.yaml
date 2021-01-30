@@ -1,0 +1,25 @@
+version: '3.5'
+
+networks:
+  external_network:
+    name: queerhaus_external
+    external: true
+  internal_network:
+    name: queerhaus_internal
+    internal: true
+    external: true
+
+services:
+
+  collective:
+    image: "{{ setups.collective.config.docker_image }}"
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.http.routers.collective.rule: Host(`collective.{{ top_domain }}`)
+      traefik.http.routers.collective.entrypoints: websecure
+      traefik.http.routers.collective.tls.certresolver: letsencrypt
+      traefik.http.services.collective.loadbalancer.server.port: 80
+    networks:
+      - external_network
+      - internal_network
