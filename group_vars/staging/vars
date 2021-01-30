@@ -26,8 +26,11 @@ setups:
     data_dir: /opt/queerhaus/hometown/data
     backup_dir: /opt/queerhaus/hometown/backup
     restore_dir: /opt/queerhaus/hometown/restore
+    deploy:
+      command: "set -x; cd /opt/queerhaus/hometown && docker-compose pull -q && docker-compose run --rm town-web rails db:migrate && docker-compose up -d && docker-compose run --rm town-web bin/tootctl cache clear"
+      public_key: "{{ vault_hometown.deploy_public_key}}"
     config:
-      docker_image: docker.pkg.github.com/queerhaus/hometown/hometown:develop
+      docker_image: docker.pkg.github.com/queerhaus/hometown/hometown:main
       secret_key_base: "{{ vault_hometown.secret_key_base }}"
       otp_secret: "{{ vault_hometown.otp_secret }}"
       vapid_private_key: "{{ vault_hometown.vapid_private_key }}"
