@@ -1,5 +1,6 @@
 ---
 top_domain: stage.queer.haus
+turn_secret: "{{ vault_turn_secret }}"
 
 setups:
   traefik:
@@ -49,3 +50,26 @@ setups:
       mysql_root_password: "{{ vault_nextcloud_mysql_root_password }}"
       mysql_password: "{{ vault_nextcloud_mysql_password }}"
       onlyoffice_secret: "{{ vault_onlyoffice_secret }}"
+  matrix:
+    run_dir: /opt/queerhaus/matrix
+    data_dir: /opt/queerhaus/matrix/data
+    backup_dir: /opt/queerhaus/matrix/backup
+    restore_dir: /opt/queerhaus/matrix/restore
+    config:
+      server_name: chat.{{ top_domain }}
+      client_domain: chat.{{ top_domain }}
+      synapse_domain: matrix.{{ top_domain }}
+      postgres_password: "{{ vault_matrix.postgres_password }}"
+      registration_secret: "{{ vault_matrix.registration_secret }}"
+      macaroon_secret: "{{ vault_matrix.macaroon_secret }}"
+      form_secret: "{{ vault_matrix.form_secret }}"
+      turn_secret: "{{ turn_secret }}"
+  mobilizon:
+    run_dir: /opt/queerhaus/mobilizon
+    data_dir: /opt/queerhaus/mobilizon/data
+    backup_dir: /opt/queerhaus/mobilizon/backup
+    restore_dir: /opt/queerhaus/mobilizon/restore
+    config:
+      domain: events.{{ top_domain }}
+      email: queerhaus@protonmail.com
+      postgres_password: "{{ vault_mobilizon.postgres_password }}"

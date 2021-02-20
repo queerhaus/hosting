@@ -11,11 +11,19 @@ staging-common:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
 staging-hometown: 
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t hometown
+staging-matrix: 
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t matrix
+staging-mobilizon: 
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t mobilizon
 
 production:
 	ansible-playbook -i hosts/production site.yml -D -v -K
+production-traefik:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t traefik
 production-hometown:
 	ansible-playbook -i hosts/production site.yml -D -v -K -t hometown
+production-nextcloud:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t nextcloud
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C

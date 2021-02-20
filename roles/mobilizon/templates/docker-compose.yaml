@@ -1,0 +1,62 @@
+version: '3.5'
+
+networks:
+  external_network:
+    name: queerhaus_external
+    external: true
+  internal_network:
+    name: queerhaus_internal
+    internal: true
+    external: true
+
+services:
+
+  mobilizon-app:
+    image: framasoft/mobilizon:1.0.6
+    restart: unless-stopped
+    environment:
+      MOBILIZON_INSTANCE_NAME: Queer Haus Events
+      MOBILIZON_INSTANCE_HOST: {{ setups.mobilizon.config.domain }}
+      MOBILIZON_INSTANCE_EMAIL: {{ setups.mobilizon.config.email }}
+      MOBILIZON_REPLY_EMAIL: {{ setups.mobilizon.config.email }}
+      #MOBILIZON_ADMIN_EMAIL: 
+      MOBILIZON_INSTANCE_REGISTRATIONS_OPEN: "true"
+      MOBILIZON_DATABASE_USERNAME: mobilizon
+      MOBILIZON_DATABASE_PASSWORD: {{ setups.mobilizon.config.postgres_password }}
+      MOBILIZON_DATABASE_DBNAME: mobilizon
+      MOBILIZON_DATABASE_HOST: mobilizon-db
+      #MOBILIZON_INSTANCE_SECRET_KEY_BASE:
+      #MOBILIZON_INSTANCE_SECRET_KEY:
+      MOBILIZON_SMTP_SERVER: {{ smtp_server }}
+      MOBILIZON_SMTP_HOSTNAME: {{ smtp_domain }}
+      MOBILIZON_SMTP_PORT: {{ smtp_port }}
+      #MOBILIZON_SMTP_SSL:
+      MOBILIZON_SMTP_USERNAME: {{ smtp_user }}
+      MOBILIZON_SMTP_PASSWORD: {{ smtp_pass }}
+    volumes:
+      - {{ setups.mobilizon.data_dir }}/uploads:/app/uploads
+    labels:
+      traefik.enable: true
+      traefik.http.routers.mobilizon.rule: Host(`{{ setups.mobilizon.config.domain }}`)
+      traefik.http.routers.mobilizon.entrypoints: websecure
+      traefik.http.routers.mobilizon.tls.certresolver: letsencrypt
+      traefik.http.middlewares.mobilizon-headers.headers.customRequestHeaders.SSLRedirect: true
+      traefik.http.middlewares.mobilizon-headers.headers.customRequestHeaders.SSLForceHost: true
+      traefik.http.middlewares.mobilizon-headers.headers.customRequestHeaders.SSLHost: {{ setups.mobilizon.config.domain }}
+      traefik.http.routers.mobilizon.middlewares: mobilizon-headers
+      traefik.http.services.mobilizon.loadbalancer.server.port: 4000
+    networks:
+      - external_network
+      - internal_network
+
+  mobilizon-db:
+    image: postgis/postgis:13-3.1-alpine
+    restart: unless-stopped
+    volumes:
+      - {{ setups.mobilizon.data_dir }}/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: mobilizon
+      POSTGRES_PASSWORD: {{ setups.mobilizon.config.postgres_password }}
+      POSTGRES_DB: mobilizon
+    networks:
+      - internal_network

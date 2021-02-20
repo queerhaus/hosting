@@ -13,20 +13,40 @@
   roles:
     - floating_ip
 
-- name: Install docker and traefik
+- name: Install docker
   hosts: all
   tags: 
     - common
   roles:
     - common
+
+- name: Install traefik
+  hosts: all
+  tags: 
+    - traefik
+  roles:
     - traefik
 
-- name: Set up hometown host
+- name: Set up hometown
   hosts: hometown_host
-  tags: hometown
+  tags: 
+    - hometown
   roles:
     - hometown
+
+- name: Set up collective website
+  hosts: hometown_host
+  tags: 
     - collective
+  roles:
+    - collective
+
+- name: Set up mobilizon
+  hosts: hometown_host
+  tags: 
+    - mobilizon
+  roles:
+    - mobilizon
 
 - name: Set up collab host
   hosts: collab_host
@@ -37,3 +57,10 @@
   roles:
     - codimd
     - nextcloud
+
+- name: Set up matrix
+  hosts: collab_host
+  tags: 
+    - matrix
+  roles:
+    - matrix

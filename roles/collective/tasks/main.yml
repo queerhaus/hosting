@@ -1,5 +1,14 @@
 ---
 
+- name: Set up deploy user authorized key
+  become: true
+  when: setups.hometown.deploy is defined
+  authorized_key:
+    user: deploy
+    state: present
+    key: "{{ setups.collective.deploy.public_key }}"
+    key_options: 'command="{{ setups.collective.deploy.command }}"'
+
 - name: Create directory
   file:
     path: "{{ setups.collective.run_dir }}"

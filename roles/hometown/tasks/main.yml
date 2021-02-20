@@ -1,5 +1,15 @@
 ---
 
+- name: Set up deploy user authorized key
+  become: true
+  when: setups.hometown.deploy is defined
+  authorized_key:
+    user: deploy
+    state: present
+    key: "{{ setups.hometown.deploy.public_key }}"
+    key_options: 'command="{{ setups.hometown.deploy.command }}"'
+
+
 - name: Install cronjob
   become: yes
   copy:
