@@ -1,39 +1,31 @@
 ---
 
-- name: Create mobilizon directory
+- name: Create peertube directory
   become: yes
   file:
-    path: "{{ setups.mobilizon.run_dir }}"
+    path: "{{ setups.peertube.run_dir }}"
     state: directory
     group: queers
     mode: "u=rwx,g=rwx,o=rx,g+s"
-
-- name: Create uploads directory
-  become: yes
-  file:
-    path: "{{ setups.mobilizon.data_dir }}/uploads"
-    state: directory
-    group: queers
-    mode: "u=rwx,g=rwx,o=rxw"
 
 - name: Template docker compose
   become: yes
   template:
     src: docker-compose.yaml
-    dest: "{{ setups.mobilizon.run_dir }}/docker-compose.yaml"
+    dest: "{{ setups.peertube.run_dir }}/docker-compose.yaml"
     group: queers
     mode: "u=rw,g=rw,o=r"
 
 - name: Pull containers images (this will take time)
   command: 
     cmd: docker-compose pull
-    chdir: "{{ setups.mobilizon.run_dir }}"
+    chdir: "{{ setups.peertube.run_dir }}"
   register: pull_result
   changed_when: pull_result.stderr.find('downloaded newer image') != -1
 
 - name: Start up containers (this can be slow)
   command: 
     cmd: docker-compose up -d --remove-orphans
-    chdir: "{{ setups.mobilizon.run_dir }}"
+    chdir: "{{ setups.peertube.run_dir }}"
   register: up_result
   changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1

@@ -48,6 +48,13 @@
   roles:
     - mobilizon
 
+- name: Set up peertube
+  hosts: hometown_host
+  tags: 
+    - peertube
+  roles:
+    - peertube
+
 - name: Set up collab host
   hosts: collab_host
   tags: 
@@ -58,9 +65,9 @@
     - codimd
     - nextcloud
 
-- name: Set up matrix
-  hosts: collab_host
-  tags: 
-    - matrix
-  roles:
-    - matrix
+# - name: Set up matrix
+#   hosts: collab_host
+#   tags: 
+#     - matrix
+#   roles:
+#     - matrix

@@ -15,6 +15,8 @@ staging-matrix:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t matrix
 staging-mobilizon: 
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t mobilizon
+staging-peertube: 
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t peertube
 
 production:
 	ansible-playbook -i hosts/production site.yml -D -v -K

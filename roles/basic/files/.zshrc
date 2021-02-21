@@ -102,3 +102,7 @@ setopt interactivecomments
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias tmc='tmux -CC attach-session -t $USER || tmux -CC new-session -s $USER'
 alias tmx='tmux attach-session -t $USER || tmux new-session -s $USER'
+alias dcu='docker-compose up -d'
+alias dcd='docker-compose down'
+alias dcr='docker-compose restart'
+alias dcl='docker-compose logs -f'

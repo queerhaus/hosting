@@ -9,7 +9,6 @@
     key: "{{ setups.hometown.deploy.public_key }}"
     key_options: 'command="{{ setups.hometown.deploy.command }}"'
 
-
 - name: Install cronjob
   become: yes
   copy:

@@ -73,3 +73,14 @@ setups:
       domain: events.{{ top_domain }}
       email: queerhaus@protonmail.com
       postgres_password: "{{ vault_mobilizon.postgres_password }}"
+  peertube:
+    run_dir: /opt/queerhaus/peertube
+    data_dir: /opt/queerhaus/peertube/data
+    backup_dir: /opt/queerhaus/peertube/backup
+    restore_dir: /opt/queerhaus/peertube/restore
+    config:
+      domain: video.{{ top_domain }}
+      email: queerhaus@protonmail.com
+      postgres_password: "{{ vault_peertube.postgres_password }}"
+      root_user_pass: "{{ vault_peertube.root_user_pass }}"
+
