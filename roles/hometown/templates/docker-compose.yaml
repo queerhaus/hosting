@@ -48,7 +48,7 @@ services:
       - town-redis
     labels:
       traefik.enable: true
-      traefik.http.routers.town-web.rule: Host(`{{ top_domain }}`,`queer.house`)
+      traefik.http.routers.town-web.rule: {{ setups.hometown.config.traefik_rule }}
       traefik.http.routers.town-web.entrypoints: websecure
       traefik.http.routers.town-web.tls.certresolver: letsencrypt
       traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true

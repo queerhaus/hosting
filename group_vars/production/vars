@@ -17,6 +17,7 @@ setups:
     backup_dir: /mnt/HC_Volume_8160201/queerhaus/backup
     restore_dir: /mnt/HC_Volume_8160201/queerhaus/restore
     config:
+      traefik_rule: "Host(`{{ top_domain }}`,`queer.house`)"
       docker_image: docker.pkg.github.com/queerhaus/hometown/hometown:main
       secret_key_base: "{{ vault_hometown.secret_key_base }}"
       otp_secret: "{{ vault_hometown.otp_secret }}"
