@@ -20,6 +20,15 @@
 #     group: queers
 #     mode: "u=rwx,g=rwx,o=rx"
 
+- name: Copy fonts
+  become: true
+  copy:
+    src: fonts/
+    dest: "{{ setups.nextcloud.data_dir }}/onlyoffice/fonts/"
+    owner: www-data
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
 - name: Template docker compose
   template:
     src: docker-compose.yaml
