@@ -6,7 +6,7 @@ galaxy:
 staging: 
 	ansible-playbook -i hosts/staging site.yml -D -v -K
 staging-traefik:
-	ansible-playbook -i hosts/staging site.yml -D -v -t traefik
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t traefik
 staging-common:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
 staging-hometown: 

@@ -31,6 +31,14 @@
     group: queers
     mode: "u=rw,g=rw,o=r"
 
+- name: Template caddy config
+  tags: traefik
+  template:
+    src: Caddyfile
+    dest: "{{ setups.traefik.run_dir }}/"
+    group: queers
+    mode: "u=rw,g=rw,o=r"
+
 - name: Pull containers images
   tags: traefik
   command:
