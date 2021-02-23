@@ -34,10 +34,12 @@ production-dry:
 
 backup-staging:
 	ansible-playbook -i hosts/staging backup-download.yml -K
+backup-staging-hometown:
+	ansible-playbook -i hosts/staging backup-download.yml -K -v -t hometown
 backup-production:
 	ansible-playbook -i hosts/production backup-download.yml -K
 backup-production-hometown:
-	ansible-playbook -i hosts/production backup-download.yml -K -t hometown
+	ansible-playbook -i hosts/production backup-download.yml -K -v -t hometown
 
 restore-staging-codimd:
 	ansible-playbook -i hosts/staging backup-restore.yml -K -v -D -t codimd

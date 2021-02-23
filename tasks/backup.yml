@@ -42,11 +42,17 @@
 
 - name: Compress the archive
   command:
-    cmd: xz -4 -T0 {{ backup_file }}.tar
+    cmd: zstd -19 -T0 --rm {{ backup_file }}.tar
     chdir: "{{ data_dir }}"
 
 - name: Download the archive
   synchronize:
     mode: pull
-    src: "{{ backup_file }}.tar.xz"
+    src: "{{ backup_file }}.tar.zst"
     dest: "backup/"
+
+- name: Delete old files keeping 3 newest
+  shell: # https://stackoverflow.com/a/52226776
+    executable: /usr/bin/zsh
+    warn: false
+    cmd: rm -f {{ backup_dir }}/*(Om[1,-4])
