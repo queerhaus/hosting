@@ -245,7 +245,8 @@
     mode: "u=rwx,g=rwx,o=rx,g+s"
 
 
-
+# Swap setup taken from here 
+# https://github.com/geerlingguy/ansible-role-swap/blob/master/tasks/enable.yml
 - name: Ensure swap file exists.
   command:
     cmd: dd if=/dev/zero of=/swapfile bs=1M count={{ swap_file_size_mb }}
