@@ -1,28 +1,11 @@
 ---
 
-- name: Ensure locale en_US exists
-  become: yes
-  community.general.locale_gen:
-    name: en_US.UTF-8
-    state: present
-
-- name: Ensure locale de_DE exists
-  become: yes
-  community.general.locale_gen:
-    name: de_DE.UTF-8
-    state: present
-
 - name: Install required packages
   become: yes
   apt: 
     name:
       - docker-compose
       - docker.io
-      - glances
-      - htop
-      - mosh
-      - tig
-      - tmux
     state: latest
     update_cache: yes
 
@@ -64,14 +47,6 @@
   notify:
     - Restart docker
 
-- name: Add users to docker group
-  become: true
-  user:
-    name: "{{ item.name }}"
-    groups: docker
-    append: yes
-  with_items: "{{ queer_users }}"
-
 - name: Create .docker directory
   become: true
   file:
@@ -101,22 +76,6 @@
   copy:
     src: etc/cron.d/queerdocker
     dest: /etc/cron.d/queerdocker
-
-- name: Create queerhaus directory
-  become: true
-  file:
-    path: /opt/queerhaus
-    state: directory
-    group: queers
-    mode: "u=rwx,g=rwx,o=rx,g+s"
-
-- name: Set up deploy user
-  become: true
-  user:
-    name: deploy
-    groups: [queers,docker]
-    state: present
-    shell: /usr/bin/zsh
 
 - name: Create .docker directory for deploy user
   become: true

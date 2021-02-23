@@ -6,8 +6,8 @@
 # so that we can track changes and verify they do not do anything harmful.
 # https://www.jeffgeerling.com/blog/2020/ansible-best-practices-using-project-local-collections-and-roles
 
-roles:
-  - name: geerlingguy.swap
+# roles:
+#   - name: geerlingguy.swap
 
 collections:
   - name: community.general

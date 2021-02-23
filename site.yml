@@ -9,16 +9,16 @@
 
 - name: Set up floating IPs
   hosts: floating_ip
-  tags: common
+  tags: basic
   roles:
     - floating_ip
 
 - name: Install docker
   hosts: all
   tags: 
-    - common
+    - docker
   roles:
-    - common
+    - docker
 
 - name: Install traefik
   hosts: all
@@ -32,38 +32,50 @@
   tags: 
     - hometown
   roles:
-    - hometown
+     - role: hometown
+       when: setups.hometown is defined
 
 - name: Set up collective website
   hosts: hometown_host
   tags: 
     - collective
   roles:
-    - collective
+     - role: collective
+       when: setups.collective is defined
 
 - name: Set up mobilizon
   hosts: hometown_host
   tags: 
     - mobilizon
   roles:
-    - mobilizon
+     - role: mobilizon
+       when: setups.mobilizon is defined
 
 - name: Set up peertube
   hosts: hometown_host
   tags: 
     - peertube
   roles:
-    - peertube
+     - role: peertube
+       when: setups.peertube is defined
 
-- name: Set up collab host
+- name: Set up nextcloud
+  hosts: collab_host
+  tags: 
+    - collab
+    - nextcloud
+  roles:
+     - role: nextcloud
+       when: setups.nextcloud is defined
+
+- name: Set up codimd
   hosts: collab_host
   tags: 
     - collab
     - codimd
-    - nextcloud
   roles:
-    - codimd
-    - nextcloud
+     - role: codimd
+       when: setups.codimd is defined
 
 # - name: Set up matrix
 #   hosts: collab_host

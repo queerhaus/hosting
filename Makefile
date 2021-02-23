@@ -4,7 +4,7 @@ galaxy:
 	ansible-galaxy collection install -r requirements.yml
 
 staging: 
-	ansible-playbook -i hosts/staging site.yml -D -v -K
+	ansible-playbook -i hosts/staging site.yml -D -K
 staging-traefik:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t traefik
 staging-common:
@@ -19,7 +19,7 @@ staging-peertube:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t peertube
 
 production:
-	ansible-playbook -i hosts/production site.yml -D -v -K
+	ansible-playbook -i hosts/production site.yml -D -K
 production-traefik:
 	ansible-playbook -i hosts/production site.yml -D -v -K -t traefik
 production-hometown:
@@ -36,7 +36,7 @@ backup-staging:
 	ansible-playbook -i hosts/staging backup-download.yml -K
 backup-production:
 	ansible-playbook -i hosts/production backup-download.yml -K
-backup-hometown:
+backup-production-hometown:
 	ansible-playbook -i hosts/production backup-download.yml -K -t hometown
 
 restore-staging-codimd:

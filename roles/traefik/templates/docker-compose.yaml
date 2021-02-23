@@ -49,7 +49,7 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      #- ./Caddyfile:/etc/caddy/Caddyfile
       - ./caddy:/usr/share/caddy
       - {{ setups.traefik.data_dir }}/caddy/data:/data
       - {{ setups.traefik.data_dir }}/caddy/config:/config

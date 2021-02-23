@@ -14,5 +14,5 @@ collab_host:
 
 hometown_host:
   hosts:
-    town.machine.queer.haus:
+    fonda.machine.queer.haus:
       floating_ip: 78.46.137.148

@@ -1,5 +1,0 @@
----
-dependencies:
-  - role: geerlingguy.swap
-    tags: swap
-    become: yes
