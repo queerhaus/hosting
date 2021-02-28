@@ -42,7 +42,7 @@
 
 - name: Compress the archive
   command:
-    cmd: zstd -19 -T0 --rm {{ backup_file }}.tar
+    cmd: nice zstd -19 -T0 --rm {{ backup_file }}.tar
     chdir: "{{ data_dir }}"
 
 - name: Download the archive
