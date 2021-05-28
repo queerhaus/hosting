@@ -8,4 +8,4 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # day of the week (0 - 6) (Sunday to Saturday; 7 is also Sunday on some systems)
 # * * * * *   user    command to execute
 
-0 3 * * *   docker    docker system prune --force --all --volumes
+0 3 * * *   root    docker system prune --force --all --volumes

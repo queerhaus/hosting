@@ -21,6 +21,9 @@ services:
     environment:
       # Disable authentication  https://www.postgresql.org/docs/current/auth-trust.html
       POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: mastodon
+      POSTGRES_PASSWORD: mastodon
+      POSTGRES_DB: mastodon
     networks:
       - internal_network
 
