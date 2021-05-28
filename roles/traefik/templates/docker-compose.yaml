@@ -43,6 +43,7 @@ services:
       traefik.http.middlewares.dashboardauth.basicauth.users: ${traefik_basic_auth}
     networks:
       - external_network
+      - internal_network
 
   # Global error page inspired from this: https://imandrea.me/blog/traefik-custom-404/
   error-pages:
@@ -66,6 +67,5 @@ services:
       #traefik.http.middlewares.error-pages.errors.query: /{status}.html
       traefik.http.services.error-pages.loadbalancer.server.port: 80
     networks:
-      - external_network
       - internal_network
 

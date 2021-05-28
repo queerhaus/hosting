@@ -21,9 +21,9 @@ services:
     environment:
       # Disable authentication  https://www.postgresql.org/docs/current/auth-trust.html
       POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_USER: mastodon
-      POSTGRES_PASSWORD: mastodon
-      POSTGRES_DB: mastodon
+      # POSTGRES_USER: mastodon
+      # POSTGRES_PASSWORD: mastodon
+      # POSTGRES_DB: mastodon
     networks:
       - internal_network
 
@@ -45,7 +45,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider --proxy=off localhost:3000/health || exit 1"]
     expose:
-      - "3000"
+      - 3000
     depends_on:
       - town-db
       - town-redis
@@ -54,13 +54,14 @@ services:
       traefik.http.routers.town-web.rule: {{ setups.hometown.config.traefik_rule }}
       traefik.http.routers.town-web.entrypoints: websecure
       traefik.http.routers.town-web.tls.certresolver: letsencrypt
-      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
-      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
-      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: {{ top_domain }}
-      traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
-      traefik.http.middlewares.town-redirect.redirectregex.replacement: {{ top_domain }}$${1}
-      traefik.http.middlewares.town-redirect.redirectregex.permanent: true
-      traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker
+      traefik.http.services.town-web.loadbalancer.server.port: 3000
+      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
+      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
+      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: {{ top_domain }}
+      # traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
+      # traefik.http.middlewares.town-redirect.redirectregex.replacement: {{ top_domain }}$${1}
+      # traefik.http.middlewares.town-redirect.redirectregex.permanent: true
+      # traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker
     volumes:
       - {{ setups.hometown.data_dir }}/public/system:/mastodon/public/system
     networks:
@@ -80,11 +81,11 @@ services:
       - town-db
       - town-redis
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.town-streaming.rule=(Host(`{{ top_domain }}`) && PathPrefix(`/api/v1/streaming`))"
-      - "traefik.http.routers.town-streaming.entrypoints=websecure"
-      - "traefik.http.routers.town-streaming.tls.certresolver=letsencrypt"
-      - "traefik.http.services.town-streaming.loadbalancer.server.port=4000"
+      traefik.enable: true
+      traefik.http.routers.town-streaming.rule: (Host(`{{ top_domain }}`) && PathPrefix(`/api/v1/streaming`))
+      traefik.http.routers.town-streaming.entrypoints: websecure
+      traefik.http.routers.town-streaming.tls.certresolver: letsencrypt
+      traefik.http.services.town-streaming.loadbalancer.server.port: 4000
     networks:
       - external_network
       - internal_network
