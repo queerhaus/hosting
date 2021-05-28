@@ -11,22 +11,23 @@ if ! which bw > /dev/null; then
 	>&2 echo "You need to install the bitwarden cli tool: https://bitwarden.com/help/article/cli/#quick-start"
 	exit 1
 fi
-if ! which keyctl > /dev/null; then
-	if ! which security > /dev/null; then
-		>&2 echo "This script requires either the 'keyctl' command on Linux or 'security' command on macOS"
-		exit 1
-	fi
-fi
 
 # Check if we already have a session stored in keychain
-if which keyctl > /dev/null; then
+if which keyring > /dev/null; then
+	if keyring get queerhaus bitwarden-session &>/dev/null; then
+		export BW_SESSION="$(keyring get queerhaus bitwarden-session)"
+	fi
+elif which keyctl > /dev/null; then
 	if keyctl search @us user bw_session &>/dev/null; then
 		export BW_SESSION="$(keyctl print $(keyctl search @us user bw_session 2>/dev/null))"
 	fi
-else
+elif which security > /dev/null; then
 	if security find-generic-password -s queerhaus-vault -a bitwarden-session -w &>/dev/null; then
-		export BW_SESSION="$(security find-generic-password -a queerhaus -s bitwarden -w)"
+		export BW_SESSION="$(security find-generic-password -s queerhaus-vault -a bitwarden-session -w)"
 	fi
+else
+	>&2 echo "This script requires either the 'keyctl' or 'keyring' command on Linux or 'security' command on macOS"
+	exit 1
 fi
 
 # Try to get the bitwarden status
@@ -56,13 +57,15 @@ if [ -z "$BW_SESSION" ]; then
 fi
 
 # Store this session
-if which keyctl > /dev/null; then
+if which keyring > /dev/null; then
+	python3 -c "import keyring; keyring.set_password('queerhaus', 'bitwarden-session', '$BW_SESSION')"
+elif which keyctl > /dev/null; then
 	if keyctl search @us user bw_session &>/dev/null; then
 		echo -n $BW_SESSION | keyctl pupdate $(keyctl search @us user bw_session 2>/dev/null)
 	else
 		echo -n $BW_SESSION | keyctl padd user bw_session @us
 	fi
-else
+elif which security > /dev/null; then
 	security add-generic-password -s queerhaus-vault -a bitwarden-session -U -w $BW_SESSION
 fi
 

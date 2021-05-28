@@ -3,22 +3,22 @@ These files describe and define how all servers and service are run on queer.hau
 
 ## Requirements
 
-### Ansible 
+### Ansible
 https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
 
+For linux we also need `jq`
 ```bash
 macos$ brew install ansible
-linux$ sudo apt install ansible
+linux$ sudo apt install ansible jq
 ```
 
-### Bitwarden CLI tool 
+### Bitwarden CLI tool
 https://bitwarden.com/help/article/cli/#download-and-install
 
 ```bash
 macos$ brew install bitwarden-cli
 linux$ sudo snap install bw
 ```
-
 
 ## Usage examples
 Running these commands will ask for `BECOME password:`, then enter your personal queerhaus linux user sudo password.
