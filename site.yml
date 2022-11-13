@@ -2,21 +2,23 @@
 
 - name: Set up SSH service and users
   hosts: all
-  tags: basic
+  tags: 
+    - basic
   gather_facts: false
   roles:
     - basic
 
 - name: Set up floating IPs
   hosts: floating_ip
-  tags: basic
+  tags: 
+    - basic
   roles:
     - floating_ip
 
 - name: Install docker
   hosts: all
   tags: 
-    - docker
+    - basic
   roles:
     - docker
 

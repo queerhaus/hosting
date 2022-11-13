@@ -6,26 +6,26 @@ galaxy:
 staging: 
 	ansible-playbook -i hosts/staging site.yml -D -K
 staging-traefik:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t traefik
-staging-common:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t common
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,traefik'
 staging-hometown: 
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t hometown
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,hometown'
 staging-matrix: 
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t matrix
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,matrix'
 staging-mobilizon: 
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t mobilizon
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,mobilizon'
 staging-peertube: 
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t peertube
+	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,peertube'
 
 production:
 	ansible-playbook -i hosts/production site.yml -D -K
 production-traefik:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t traefik
+	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,traefik'
 production-hometown:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t hometown
+	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,hometown'
 production-nextcloud:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t nextcloud
+	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,nextcloud'
+production-codimd:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,codimd'
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C

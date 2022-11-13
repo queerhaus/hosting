@@ -52,7 +52,7 @@ fi
 
 # Check that session did not fail
 if [ -z "$BW_SESSION" ]; then
-	>&2 echo "Failed to get bitwarden session"
+	>&2 echo "Failed to get bitwarden session, status output: $status"
 	exit 1
 fi
 
