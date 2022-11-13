@@ -19,3 +19,6 @@ other settings default, passwords empty
 ## Maintenance
 Run the mastodon cli tool like this:
 `docker-compose exec town-web tootctl <command>`
+
+## Clear cached media files that can grow large
+`docker-compose exec town-web tootctl media remove`

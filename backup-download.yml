@@ -22,6 +22,10 @@
     backup_dir: "{{ setups.hometown.backup_dir }}"
     backup_file: "{{ setups.hometown.backup_dir }}/hometown_{{ inventory_hostname }}_{{ ansible_date_time.iso8601_basic_short }}"
   tasks:
+    - name: Clear cached media files for smaller backup
+      command:
+        cmd: docker-compose exec town-web tootctl media remove
+        chdir: "{{ run_dir }}"
     - include_tasks: tasks/backup.yml
 
 - name: Copy codimd data to localhost
