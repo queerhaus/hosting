@@ -23,6 +23,8 @@ setups:
       otp_secret: "{{ vault_hometown.otp_secret }}"
       vapid_private_key: "{{ vault_hometown.vapid_private_key }}"
       vapid_public_key: "{{ vault_hometown.vapid_public_key }}"
+      redirect_source: "{{ vault_hometown.redirect_source }}"
+      redirect_target: "{{ vault_hometown.redirect_target }}"
   codimd:
     run_dir: /opt/queerhaus/codimd
     data_dir: /opt/queerhaus/codimd/data

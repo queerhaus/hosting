@@ -55,13 +55,16 @@ services:
       traefik.http.routers.town-web.entrypoints: websecure
       traefik.http.routers.town-web.tls.certresolver: letsencrypt
       traefik.http.services.town-web.loadbalancer.server.port: 3000
-      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
-      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
-      # traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: {{ top_domain }}
-      # traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
-      # traefik.http.middlewares.town-redirect.redirectregex.replacement: {{ top_domain }}$${1}
-      # traefik.http.middlewares.town-redirect.redirectregex.permanent: true
-      # traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLRedirect: true
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLForceHost: true
+      traefik.http.middlewares.town-headers.headers.customRequestHeaders.SSLHost: {{ top_domain }}
+      traefik.http.middlewares.town-redirect.redirectregex.regex: queer.house([/](.*))*
+      traefik.http.middlewares.town-redirect.redirectregex.replacement: {{ top_domain }}$${1}
+      traefik.http.middlewares.town-redirect.redirectregex.permanent: true
+      traefik.http.middlewares.town-short.redirectregex.regex: "{{ setups.hometown.config.redirect_source }}$$"
+      traefik.http.middlewares.town-short.redirectregex.replacement: {{ setups.hometown.config.redirect_target }}
+      traefik.http.middlewares.town-short.redirectregex.permanent: false
+      traefik.http.routers.town-web.middlewares: town-headers@docker,town-redirect@docker,town-short@docker
     volumes:
       - {{ setups.hometown.data_dir }}/public/system:/mastodon/public/system
     networks:
