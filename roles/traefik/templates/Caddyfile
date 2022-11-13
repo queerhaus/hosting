@@ -7,13 +7,18 @@
 # sure your domain's A/AAAA DNS records are properly pointed to
 # this machine's public IP, then replace the line below with your
 # domain name.
-:80
+:80 {
+	root * /usr/share/caddy
 
-# Set this path to your site's directory.
-root * /usr/share/caddy
+	header {
+		-Etag
+		-Last-Modified
+		Cache-Control no-cache
+		Retry-After: 300
+	}
 
-# Enable the static file server.
-file_server
-
-# Make all requests return 503
-status 503 /index.html
+	file_server {
+		# Make all requests return 503
+		status 503
+	}
+}
