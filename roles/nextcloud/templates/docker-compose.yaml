@@ -26,7 +26,7 @@ services:
       - internal_network
 
   nextcloud-app:
-    image: nextcloud:20.0
+    image: nextcloud:21.0
     depends_on:
       - nextcloud-db
       - onlyoffice-documentserver
