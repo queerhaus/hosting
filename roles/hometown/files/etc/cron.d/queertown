@@ -9,3 +9,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # * * * * *   user    command to execute
 
 0 4 * * *   queeradmin    /opt/queerhaus/hometown/backup.sh
+
+# WARNING there has to be a newline at the end of this file for commands to work

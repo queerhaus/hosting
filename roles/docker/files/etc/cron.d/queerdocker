@@ -9,3 +9,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # * * * * *   user    command to execute
 
 0 3 * * *   root    docker system prune --force --all --volumes
+
+# WARNING there has to be a newline at the end of this file for commands to work
