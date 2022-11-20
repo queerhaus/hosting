@@ -18,14 +18,16 @@ staging-peertube:
 
 production:
 	ansible-playbook -i hosts/production site.yml -D -K
+production-basic:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t basic
 production-traefik:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,traefik'
+	ansible-playbook -i hosts/production site.yml -D -v -K -t traefik
 production-hometown:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,hometown'
+	ansible-playbook -i hosts/production site.yml -D -v -K -t hometown
 production-nextcloud:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,nextcloud'
+	ansible-playbook -i hosts/production site.yml -D -v -K -t nextcloud
 production-codimd:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,codimd'
+	ansible-playbook -i hosts/production site.yml -D -v -K -t codimd
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C

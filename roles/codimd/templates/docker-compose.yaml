@@ -32,7 +32,7 @@ services:
       - internal_network
 
   codi-web:
-    image: linuxserver/codimd:version-1.6.0
+    image: quay.io/hedgedoc/hedgedoc:1.9.6-alpine
     restart: unless-stopped
     #mem_limit: 256mb         # version 2 only
     #memswap_limit: 512mb     # version 2 only
@@ -47,7 +47,7 @@ services:
       CMD_FORBIDDEN_NOTE_IDS: robots.txt
       CMD_IMAGE_UPLOAD_TYPE: filesystem
       CMD_PORT: 3000
-      CMD_DOMAIN: codimd.{{ top_domain }}
+      CMD_DOMAIN: notes.{{ top_domain }}
       CMD_PROTOCOL_USESSL: "true"
       CMD_USECDN: "false"
       CMD_URL_ADDPORT: "false"
@@ -58,11 +58,15 @@ services:
     depends_on:
       - codi-db
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.codi-web.rule=Host(`codimd.{{ top_domain }}`)"
-      - "traefik.http.routers.codi-web.entrypoints=websecure"
-      - "traefik.http.routers.codi-web.tls.certresolver=letsencrypt"
-      - "traefik.http.services.codi-web.loadbalancer.server.port=3000"
+      traefik.enable: true
+      traefik.http.routers.codi-web.rule: Host(`notes.{{ top_domain }}`,`codimd.{{ top_domain }}`)
+      traefik.http.routers.codi-web.entrypoints: websecure
+      traefik.http.routers.codi-web.tls.certresolver: letsencrypt
+      traefik.http.services.codi-web.loadbalancer.server.port: 3000
+      traefik.http.middlewares.codi-redirect.redirectregex.regex: codimd.{{ top_domain }}([/](.*))*
+      traefik.http.middlewares.codi-redirect.redirectregex.replacement: notes.{{ top_domain }}$${1}
+      traefik.http.middlewares.codi-redirect.redirectregex.permanent: true
+      traefik.http.routers.codi-web.middlewares: codi-redirect@docker
     networks:
       - external_network
       - internal_network

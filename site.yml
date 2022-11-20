@@ -29,6 +29,14 @@
   roles:
     - traefik
 
+- name: Set up codimd
+  hosts: hometown_host
+  tags:
+    - codimd
+  roles:
+     - role: codimd
+       when: setups.codimd is defined
+
 - name: Set up hometown
   hosts: hometown_host
   tags: 
@@ -70,14 +78,6 @@
      - role: nextcloud
        when: setups.nextcloud is defined
 
-- name: Set up codimd
-  hosts: collab_host
-  tags: 
-    - collab
-    - codimd
-  roles:
-     - role: codimd
-       when: setups.codimd is defined
 
 # - name: Set up matrix
 #   hosts: collab_host
