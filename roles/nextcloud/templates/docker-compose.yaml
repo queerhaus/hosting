@@ -26,10 +26,10 @@ services:
       - internal_network
 
   nextcloud-app:
-    image: nextcloud:21.0
+    image: nextcloud:21
     depends_on:
       - nextcloud-db
-      - onlyoffice-documentserver
+      #- onlyoffice-documentserver
     volumes:
       - {{ setups.nextcloud.data_dir }}/nextcloud/app:/var/www/html
     environment:
@@ -57,61 +57,61 @@ services:
       - external_network
       - internal_network
 
-  onlyoffice-documentserver:
-    image: onlyoffice/documentserver:6.0
-    depends_on:
-      - onlyoffice-postgresql
-      - onlyoffice-rabbitmq
-    environment:
-      - DB_TYPE=postgres
-      - DB_HOST=onlyoffice-postgresql
-      - DB_PORT=5432
-      - DB_NAME=onlyoffice
-      - DB_USER=onlyoffice
-      - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
-      # Uncomment strings below to enable the JSON Web Token validation.
-      - JWT_ENABLED=true
-      - JWT_SECRET={{ setups.nextcloud.config.onlyoffice_secret }}
-      #- JWT_HEADER=Authorization
-      #- JWT_IN_BODY=true
-    stdin_open: true
-    restart: unless-stopped
-    volumes:
-       - {{ setups.nextcloud.data_dir }}/onlyoffice/data:/var/www/onlyoffice/Data
-       - {{ setups.nextcloud.data_dir }}/onlyoffice/logs:/var/log/onlyoffice
-       - {{ setups.nextcloud.data_dir }}/onlyoffice/cache:/var/lib/onlyoffice/documentserver/App_Data/cache/files
-       - {{ setups.nextcloud.data_dir }}/onlyoffice/public:/var/www/onlyoffice/documentserver-example/public/files
-       - {{ setups.nextcloud.data_dir }}/onlyoffice/fonts:/usr/share/fonts
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.onlyoffice.rule=Host(`office.{{ top_domain }}`)"
-      - "traefik.http.routers.onlyoffice.entrypoints=websecure"
-      - "traefik.http.routers.onlyoffice.tls.certresolver=letsencrypt"
-      # https://community.traefik.io/t/traefik-2-0-and-onlyoffice-not-work-work-correctly-in-v-2/3286/3
-      - "traefik.http.routers.onlyoffice.middlewares=oo-header"
-      - "traefik.http.middlewares.oo-header.headers.customRequestHeaders.X-Forwarded-Proto=https"
-    networks:
-      - external_network
-      - internal_network
+  # onlyoffice-documentserver:
+  #   image: onlyoffice/documentserver:6.0
+  #   depends_on:
+  #     - onlyoffice-postgresql
+  #     - onlyoffice-rabbitmq
+  #   environment:
+  #     - DB_TYPE=postgres
+  #     - DB_HOST=onlyoffice-postgresql
+  #     - DB_PORT=5432
+  #     - DB_NAME=onlyoffice
+  #     - DB_USER=onlyoffice
+  #     - AMQP_URI=amqp://guest:guest@onlyoffice-rabbitmq
+  #     # Uncomment strings below to enable the JSON Web Token validation.
+  #     - JWT_ENABLED=true
+  #     - JWT_SECRET={{ setups.nextcloud.config.onlyoffice_secret }}
+  #     #- JWT_HEADER=Authorization
+  #     #- JWT_IN_BODY=true
+  #   stdin_open: true
+  #   restart: unless-stopped
+  #   volumes:
+  #      - {{ setups.nextcloud.data_dir }}/onlyoffice/data:/var/www/onlyoffice/Data
+  #      - {{ setups.nextcloud.data_dir }}/onlyoffice/logs:/var/log/onlyoffice
+  #      - {{ setups.nextcloud.data_dir }}/onlyoffice/cache:/var/lib/onlyoffice/documentserver/App_Data/cache/files
+  #      - {{ setups.nextcloud.data_dir }}/onlyoffice/public:/var/www/onlyoffice/documentserver-example/public/files
+  #      - {{ setups.nextcloud.data_dir }}/onlyoffice/fonts:/usr/share/fonts
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.onlyoffice.rule=Host(`office.{{ top_domain }}`)"
+  #     - "traefik.http.routers.onlyoffice.entrypoints=websecure"
+  #     - "traefik.http.routers.onlyoffice.tls.certresolver=letsencrypt"
+  #     # https://community.traefik.io/t/traefik-2-0-and-onlyoffice-not-work-work-correctly-in-v-2/3286/3
+  #     - "traefik.http.routers.onlyoffice.middlewares=oo-header"
+  #     - "traefik.http.middlewares.oo-header.headers.customRequestHeaders.X-Forwarded-Proto=https"
+  #   networks:
+  #     - external_network
+  #     - internal_network
        
-  onlyoffice-rabbitmq:
-    image: rabbitmq:3
-    restart: unless-stopped
-    expose:
-      - '5672'
-    networks:
-      - internal_network
+  # onlyoffice-rabbitmq:
+  #   image: rabbitmq:3
+  #   restart: unless-stopped
+  #   expose:
+  #     - '5672'
+  #   networks:
+  #     - internal_network
 
-  onlyoffice-postgresql:
-    image: postgres:9.6-alpine
-    environment:
-      - POSTGRES_DB=onlyoffice
-      - POSTGRES_USER=onlyoffice
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    restart: unless-stopped
-    expose:
-      - '5432'
-    volumes:
-      - {{ setups.nextcloud.data_dir }}/onlyoffice/postgres:/var/lib/postgresql
-    networks:
-      - internal_network
+  # onlyoffice-postgresql:
+  #   image: postgres:9.6-alpine
+  #   environment:
+  #     - POSTGRES_DB=onlyoffice
+  #     - POSTGRES_USER=onlyoffice
+  #     - POSTGRES_HOST_AUTH_METHOD=trust
+  #   restart: unless-stopped
+  #   expose:
+  #     - '5432'
+  #   volumes:
+  #     - {{ setups.nextcloud.data_dir }}/onlyoffice/postgres:/var/lib/postgresql
+  #   networks:
+  #     - internal_network
