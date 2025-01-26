@@ -1,4 +1,8 @@
 # This is only a set of shortcuts, you can also run the ansible-playbook command directly
+
+# bitwarden-cli fails with deprecation error https://github.com/bitwarden/clients/issues/6689
+export NODE_OPTIONS="--no-deprecation"
+
 galaxy:
 	ansible-galaxy role install -r requirements.yml
 	ansible-galaxy collection install -r requirements.yml

@@ -19,7 +19,7 @@
 - name: Delete old files keeping 2 newest
   shell: # https://stackoverflow.com/a/52226776
     executable: /usr/bin/zsh
-    warn: false
+    #warn: false
     cmd: rm -f {{ backup_dir }}/*(Om[1,-2])
 
 - name: Stop all containers
@@ -32,7 +32,7 @@
   command:
     cmd: tar -cf {{ backup_file }}.tar .
     chdir: "{{ data_dir }}"
-    warn: false
+    #warn: false
 
 - name: Start all containers again for minimum downtime
   command:

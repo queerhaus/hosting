@@ -1,16 +1,16 @@
 ---
 production:
   children:
-    collab_host:
+#    collab_host:
     hometown_host:
 
 floating_ip:
   children:
     hometown_host:
 
-collab_host:
-  hosts:
-    marsha.machine.queer.haus:
+#collab_host:
+#  hosts:
+#    marsha.machine.queer.haus:
 
 hometown_host:
   hosts:
