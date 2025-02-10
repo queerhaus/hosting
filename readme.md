@@ -23,34 +23,14 @@ linux$ sudo snap install bw
 ## Usage examples
 Running these commands will ask for `BECOME password:`, then enter your personal queerhaus linux user sudo password.
 
-To run all configuration commands on our staging hosts:
+Set up ansible on your machine:
 ```bash
-make stage
+make setup
 ```
 
 To run all configuration updates in PRODUCTION:
 ```bash
 make production
-```
-
-To download a local copy of all staging data as a backup
-```bash
-make download-staging
-```
-
-Download a local copy of all production data as a backup
-```bash
-make download-production
-```
-
-Deploy a new version of our hometown repo in production
-```bash
-make deploy-hometown-production
-```
-
-Restart hometown services in production (queer.haus)
-```bash
-make restart-hometown-production
 ```
 
 
@@ -69,7 +49,8 @@ To decrypt these values you need the master password that was used to encrypt th
 
 Once BitWarden is unlocked and the password retrieved, all encrypted values will automatically be decrypted as you run Ansible commands.
 
-To edit an encrypted file in place you can use this command: `ansible-vault edit group_vars/all/vault`
+To edit an encrypted file in place you can use this command:
+`ansible-vault edit group_vars/all/vault`
 
 
 ## Add a new linux user
@@ -92,7 +73,7 @@ cat ~/.ssh/id_ed25519.pub
 ```
 
 ### Generate new user password
-Your linux user that will be created on our servers also needs a password. This will be used for "sudo" operations. You can generate one that is directly encrypted like this. 
+Your linux user that will be created on our servers also needs a password. This will be used for "sudo" operations. You can generate one that is directly encrypted like this.
 ```bash
 ansible-vault encrypt_string $(mkpasswd --method=sha-512) --name sudo_password
 ```

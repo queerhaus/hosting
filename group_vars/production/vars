@@ -11,31 +11,13 @@ setups:
       username: admin
       password: "{{ vault_traefik_admin_password }}"
       email: queerhaus@protonmail.com
-  hometown:
-    run_dir: /opt/queerhaus/hometown
-    data_dir: /mnt/HC_Volume_8160201/queerhaus/hometown
-    backup_dir: /mnt/HC_Volume_8160201/queerhaus/backup
-    restore_dir: /mnt/HC_Volume_8160201/queerhaus/restore
+  collective:
+    run_dir: /opt/queerhaus/collective
+    data_dir: /opt/queerhaus/collective/data
+    backup_dir: /opt/queerhaus/collective/backup
+    restore_dir: /opt/queerhaus/collective/restore
+    deploy:
+      command: "set -x; cd /opt/queerhaus/collective && docker compose pull && docker compose up -d"
+      public_key: "{{ vault_collective.deploy_public_key}}"
     config:
-      traefik_rule: "Host(`{{ top_domain }}`,`queer.house`)"
-      docker_image: ghcr.io/queerhaus/hometown:main
-      secret_key_base: "{{ vault_hometown.secret_key_base }}"
-      otp_secret: "{{ vault_hometown.otp_secret }}"
-      vapid_private_key: "{{ vault_hometown.vapid_private_key }}"
-      vapid_public_key: "{{ vault_hometown.vapid_public_key }}"
-      redirect_source: "{{ vault_hometown.redirect_source }}"
-      redirect_target: "{{ vault_hometown.redirect_target }}"
-  codimd:
-    run_dir: /opt/queerhaus/codimd
-    data_dir: /opt/queerhaus/codimd/data
-    backup_dir: /opt/queerhaus/codimd/backup
-    restore_dir: /opt/queerhaus/codimd/restore
-  nextcloud:
-    run_dir: /opt/queerhaus/nextcloud
-    data_dir: /mnt/HC_Volume_8042163/queerhaus/nextcloud
-    backup_dir: /mnt/HC_Volume_8042163/queerhaus/backup
-    restore_dir: /mnt/HC_Volume_8042163/queerhaus/restore
-    config:
-      mysql_root_password: "{{ vault_nextcloud_mysql_root_password }}"
-      mysql_password: "{{ vault_nextcloud_mysql_password }}"
-      onlyoffice_secret: "{{ vault_onlyoffice_secret }}"
+      docker_image: docker.pkg.github.com/queerhaus/collective/collective:main

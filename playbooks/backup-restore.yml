@@ -3,7 +3,7 @@
 # They will overwrite and delete files on the hosts!
 
 - name: Restore traefik backup
-  hosts: 
+  hosts:
     - hometown_host
     - collab_host
   tags: traefik
@@ -24,7 +24,7 @@
 
 - name: Restore codimd backup from localhost
   hosts: collab_host
-  tags: 
+  tags:
     - codimd
     - collab
   vars:
@@ -39,7 +39,7 @@
 
 - name: Upload nextcloud data files from localhost
   hosts: collab_host
-  tags: 
+  tags:
     - nextcloud
     - collab
   tasks:
@@ -60,7 +60,7 @@
 
   - name: Stop all containers
     command:
-      cmd: docker-compose down
+      cmd: docker compose down
       chdir: /opt/queerhaus/nextcloud
 
   - name: Backup the live data
@@ -81,5 +81,5 @@
 
   - name: Start all containers again
     command:
-      cmd: docker-compose up -d
+      cmd: docker compose up -d
       chdir: /opt/queerhaus/nextcloud

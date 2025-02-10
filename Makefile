@@ -3,74 +3,43 @@
 # bitwarden-cli fails with deprecation error https://github.com/bitwarden/clients/issues/6689
 export NODE_OPTIONS="--no-deprecation"
 
+.PHONY: setup galaxy hosts
+setup: galaxy hosts
+
 galaxy:
 	ansible-galaxy role install -r requirements.yml
 	ansible-galaxy collection install -r requirements.yml
+
+hosts:
+	ansible-playbook -i hosts/production playbooks/known-hosts.yml -D
 
 staging:
 	ansible-playbook -i hosts/staging site.yml -D -K
 staging-traefik:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,traefik'
-staging-hometown:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,hometown'
-staging-matrix:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,matrix'
-staging-mobilizon:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,mobilizon'
-staging-peertube:
-	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,peertube'
 
 production:
-	ansible-playbook -i hosts/production site.yml -D -K
-production-basic:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t basic
+	ansible-playbook -i hosts/production site.yml --diff --ask-become-pass
 production-traefik:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t traefik
-production-hometown:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t hometown
-production-nextcloud:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t nextcloud
-production-codimd:
-	ansible-playbook -i hosts/production site.yml -D -v -K -t codimd
+	ansible-playbook -i hosts/production site.yml -D -v -K -t 'basic,traefik'
+production-collective:
+	ansible-playbook -i hosts/production site.yml -D -v -K -t collective
 
 staging-dry:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -C
 production-dry:
 	ansible-playbook -i hosts/production site.yml -D -v -K -C
 
-backup-staging:
-	ansible-playbook -i hosts/staging backup-download.yml -K
-backup-staging-hometown:
-	ansible-playbook -i hosts/staging backup-download.yml -K -v -t hometown
 backup-production:
-	ansible-playbook -i hosts/production backup-download.yml -K
-backup-production-hometown:
-	ansible-playbook -i hosts/production backup-download.yml -K -v -t hometown
-backup-production-codimd:
-	ansible-playbook -i hosts/production backup-download.yml -K -v -t codimd
+	ansible-playbook -i hosts/production playbooks/backup-download.yml -K
+restore-staging:
+	ansible-playbook -i hosts/staging playbooks/backup-restore.yml -K -v -D
 
-restore-staging-codimd:
-	ansible-playbook -i hosts/staging backup-restore.yml -K -v -D -t codimd
-
-deploy-hometown-staging:
-	ansible-playbook -i hosts/staging deploy.yml -D -v -t hometown
-deploy-hometown-production:
-	ansible-playbook -i hosts/production deploy.yml -D -v -t hometown
+deploy-production:
+	ansible-playbook -i hosts/production playbooks/deploy.yml -D -v
 
 restart-staging:
-	ansible-playbook -i hosts/staging restart.yml -D -v
-restart-common-staging:
-	ansible-playbook -i hosts/staging restart.yml -D -v -t common
-restart-codimd-staging:
-	ansible-playbook -i hosts/staging restart.yml -D -v -t codimd
-restart-nextcloud-staging:
-	ansible-playbook -i hosts/staging restart.yml -D -v -t nextcloud
-restart-hometown-staging:
-	ansible-playbook -i hosts/staging restart.yml -D -v -t hometown
+	ansible-playbook -i hosts/staging playbooks/restart.yml -D -v
 
-restart-codimd-production:
-	ansible-playbook -i hosts/production restart.yml -D -v -t codimd
-restart-nextcloud-production:
-	ansible-playbook -i hosts/production restart.yml -D -v -t nextcloud
-restart-hometown-production:
-	ansible-playbook -i hosts/production restart.yml -D -v -t hometown
+restart-production:
+	ansible-playbook -i hosts/production playbooks/restart.yml -D -v

@@ -1,10 +1,10 @@
 ---
 
 - name: Install required packages
-  become: yes
-  apt: 
+  become: true
+  apt:
     name:
-      - docker-compose
+      - docker-compose-v2
       - docker.io
     state: latest
     update_cache: yes
@@ -12,10 +12,10 @@
 # If we one day need a newer version of docker this is how to install it
 # - name: Uninstall old docker
 #   become: true
-#   apt: 
+#   apt:
 #     name:
 #       - docker.io
-#     state: absent 
+#     state: absent
 #     update_cache: no
 # - name: Add Docker apt key
 #   become: yes
@@ -32,15 +32,15 @@
 #     update_cache: true
 # - name: Install docker
 #   become: true
-#   apt: 
+#   apt:
 #     name:
 #       - docker-ce
 #       - docker-compose
-#     state: latest 
+#     state: latest
 #     update_cache: no
 
 - name: Install custom docker config
-  become: yes
+  become: true
   copy:
     src: etc/docker/daemon.json
     dest: /etc/docker/daemon.json
@@ -66,13 +66,13 @@
   with_items: "{{ queer_users }}"
 
 - name: Ensure docker is running
-  become: yes
+  become: true
   service:
     name: docker
     state: started
 
 - name: Install docker purge cronjob
-  become: yes
+  become: true
   copy:
     src: etc/cron.d/queerdocker
     dest: /etc/cron.d/queerdocker

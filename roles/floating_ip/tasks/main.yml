@@ -1,7 +1,7 @@
 ---
 
 - name: Install floating IP config
-  become: yes
+  become: true
   template:
     src: floating-ip.yaml
     dest: /etc/netplan/60-floating-ip.yaml

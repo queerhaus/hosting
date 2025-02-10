@@ -18,7 +18,7 @@ setups:
     backup_dir: /opt/queerhaus/collective/backup
     restore_dir: /opt/queerhaus/collective/restore
     deploy:
-      command: "set -x; cd /opt/queerhaus/collective && docker-compose pull && docker-compose up -d"
+      command: "set -x; cd /opt/queerhaus/collective && docker compose pull && docker compose up -d"
       public_key: "{{ vault_collective.deploy_public_key}}"
     config:
       docker_image: docker.pkg.github.com/queerhaus/collective/collective:main
@@ -28,7 +28,7 @@ setups:
     backup_dir: /opt/queerhaus/hometown/backup
     restore_dir: /opt/queerhaus/hometown/restore
     deploy:
-      command: "set -x; cd /opt/queerhaus/hometown && docker-compose pull -q && docker-compose run --rm town-web rails db:migrate && docker-compose up -d && docker-compose run --rm town-web bin/tootctl cache clear"
+      command: "set -x; cd /opt/queerhaus/hometown && docker compose pull -q && docker compose run --rm town-web rails db:migrate && docker-compose up -d && docker-compose run --rm town-web bin/tootctl cache clear"
       public_key: "{{ vault_hometown.deploy_public_key}}"
     config:
       traefik_rule: "Host(`{{ top_domain }}`)"
@@ -86,4 +86,3 @@ setups:
       email: queerhaus@protonmail.com
       postgres_password: "{{ vault_peertube.postgres_password }}"
       root_user_pass: "{{ vault_peertube.root_user_pass }}"
-

@@ -42,7 +42,7 @@
 - name: Pull containers images
   tags: traefik
   command:
-    cmd: docker-compose pull
+    cmd: docker compose pull
     chdir: "{{ setups.traefik.run_dir }}"
   register: pull_result
   changed_when: pull_result.stderr.find('downloaded newer image') != -1
@@ -50,7 +50,7 @@
 - name: Start up containers
   tags: traefik
   command:
-    cmd: docker-compose up -d --remove-orphans
+    cmd: docker compose up -d --remove-orphans
     chdir: "{{ setups.traefik.run_dir }}"
   register: up_result
   changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1

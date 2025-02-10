@@ -7,25 +7,25 @@
 
   - name: Pull new images
     command:
-      cmd: docker-compose pull
+      cmd: docker compose pull
       chdir: /opt/queerhaus/hometown
 
   - name: Run pre-upgrade migrations
     command:
-      cmd: docker-compose run --rm -e SKIP_POST_DEPLOYMENT_MIGRATIONS=true town-web rails db:migrate
+      cmd: docker compose run --rm -e SKIP_POST_DEPLOYMENT_MIGRATIONS=true town-web rails db:migrate
       chdir: /opt/queerhaus/hometown
 
   - name: Restart containers as needed
     command:
-      cmd: docker-compose up -d
+      cmd: docker compose up -d
       chdir: /opt/queerhaus/hometown
 
   - name: Clear caches
     command:
-      cmd: docker-compose run --rm town-web bin/tootctl cache clear
+      cmd: docker compose run --rm town-web bin/tootctl cache clear
       chdir: /opt/queerhaus/hometown
 
   - name: Run post-upgrade migrations
     command:
-      cmd: docker-compose run --rm town-web rails db:migrate
+      cmd: docker compose run --rm town-web rails db:migrate
       chdir: /opt/queerhaus/hometown

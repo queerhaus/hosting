@@ -24,15 +24,15 @@
     mode: "u=rw,g=rw,o=r"
 
 - name: Pull containers images
-  command: 
-    cmd: docker-compose pull
+  command:
+    cmd: docker compose pull
     chdir: "{{ setups.collective.run_dir }}"
   register: pull_result
   changed_when: pull_result.stderr.find('downloaded newer image') != -1
 
 - name: Start up containers
-  command: 
-    cmd: docker-compose up -d --remove-orphans
+  command:
+    cmd: docker compose up -d --remove-orphans
     chdir: "{{ setups.collective.run_dir }}"
   register: up_result
   changed_when: up_result.stderr.find('Creating') != -1 or up_result.stderr.find('Recreating') != -1

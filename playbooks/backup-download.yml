@@ -24,7 +24,7 @@
   tasks:
     - name: Clear cached media files for smaller backup
       command:
-        cmd: docker-compose exec town-web tootctl media remove
+        cmd: docker compose exec town-web tootctl media remove
         chdir: "{{ run_dir }}"
     - include_tasks: tasks/backup.yml
 

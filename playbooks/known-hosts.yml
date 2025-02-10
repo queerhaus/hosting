@@ -11,7 +11,6 @@
     ssh_known_hosts: "{{ groups['all'] }}"
 
   tasks:
-
   - name: For each host, scan for its ssh public key
     shell: "ssh-keyscan {{ item }},`dig +short {{ item }}`"
     with_items: "{{ ssh_known_hosts }}"

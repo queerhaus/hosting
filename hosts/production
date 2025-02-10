@@ -1,18 +1,12 @@
 ---
 production:
   children:
-#    collab_host:
-    hometown_host:
+    main_host:
 
-floating_ip:
-  children:
-    hometown_host:
+#floating_ip:
+#  children:
+#    main_host:
 
-#collab_host:
-#  hosts:
-#    marsha.machine.queer.haus:
-
-hometown_host:
+main_host:
   hosts:
-    fonda.machine.queer.haus:
-      floating_ip: 78.46.137.148
+    octavia.machine.queer.haus:

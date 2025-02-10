@@ -2,7 +2,7 @@
 
 - name: Set up SSH service and users
   hosts: all
-  tags: 
+  tags:
     - basic
   gather_facts: false
   roles:
@@ -10,78 +10,37 @@
 
 - name: Set up floating IPs
   hosts: floating_ip
-  tags: 
+  tags:
     - basic
   roles:
     - floating_ip
 
 - name: Install docker
   hosts: all
-  tags: 
+  tags:
     - basic
   roles:
     - docker
 
 - name: Install traefik
   hosts: all
-  tags: 
-    - traefik
-  roles:
-    - traefik
-
-- name: Set up codimd
-  hosts: hometown_host
   tags:
-    - codimd
+    - traefik
   roles:
-     - role: codimd
-       when: setups.codimd is defined
-
-- name: Set up hometown
-  hosts: hometown_host
-  tags: 
-    - hometown
-  roles:
-     - role: hometown
-       when: setups.hometown is defined
+    - traefik
 
 - name: Set up collective website
-  hosts: hometown_host
-  tags: 
+  hosts: main_host
+  tags:
     - collective
   roles:
      - role: collective
        when: setups.collective is defined
 
-- name: Set up mobilizon
-  hosts: hometown_host
-  tags: 
-    - mobilizon
-  roles:
-     - role: mobilizon
-       when: setups.mobilizon is defined
-
-- name: Set up peertube
-  hosts: hometown_host
-  tags: 
-    - peertube
-  roles:
-     - role: peertube
-       when: setups.peertube is defined
-
-- name: Set up nextcloud
-  hosts: collab_host
-  tags: 
-    - collab
-    - nextcloud
-  roles:
-     - role: nextcloud
-       when: setups.nextcloud is defined
-
-
-# - name: Set up matrix
-#   hosts: collab_host
-#   tags: 
-#     - matrix
+# - name: Set up mobilizon
+#   hosts: main_host
+#   tags:
+#     - mobilizon
 #   roles:
-#     - matrix
+#      - role: mobilizon
+#        when: setups.mobilizon is defined

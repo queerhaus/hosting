@@ -54,7 +54,7 @@
 
 - name: Stop all containers
   command:
-    cmd: docker-compose stop
+    cmd: docker compose stop
     chdir: "{{ run_dir }}"
 
 - name: Archive the live data before we replace it
@@ -73,7 +73,7 @@
 
 - name: Start all containers again for minimum downtime
   command:
-    cmd: docker-compose up -d
+    cmd: docker compose up -d
     chdir: "{{ run_dir }}"
 
 - name: Change owner of backed up live archive
