@@ -1,5 +1,4 @@
 ---
-ansible_port: 2020
 ansible_user: exstral
 
 swap_file_size_mb: 4096
@@ -30,7 +29,7 @@ queer_users:
     github_personal_access_token: ""
 
   - name: exstral
-    ssh_public_keys: 
+    ssh_public_keys:
     - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDp36grS58NYc7VXRyNmLMO8mueMu6ZwctT1Y2IX/WgV exstral@tuxipop"
     - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHbKBweLoMZ1a/R+AcZCjqJ96cmx3xDIQ2hKAiV9Ql2E exstral@eribook"
     sudo_password: !vault |

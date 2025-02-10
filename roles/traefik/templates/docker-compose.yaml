@@ -12,7 +12,7 @@ services:
   traefik:
     image: traefik:2.2
     restart: unless-stopped
-    command: 
+    command:
       #- "--log.level=DEBUG"
       - "--api.dashboard=true"
       - "--entrypoints.web.address=:80"
@@ -32,7 +32,7 @@ services:
       - "1935:1935/tcp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - {{ setups.traefik.data_dir }}/letsencrypt:/letsencrypt
+      - "{{ setups.traefik.data_dir }}/letsencrypt:/letsencrypt"
     labels:
       traefik.enable: true
       traefik.http.routers.traefik.rule: Host(`{{ inventory_hostname }}`)
@@ -52,8 +52,8 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./caddy:/usr/share/caddy
-      - {{ setups.traefik.data_dir }}/caddy/data:/data
-      - {{ setups.traefik.data_dir }}/caddy/config:/config
+      - "{{ setups.traefik.data_dir }}/caddy/data:/data"
+      - "{{ setups.traefik.data_dir }}/caddy/config:/config"
     labels:
       traefik.enable: true
       traefik.http.routers.error-router.rule: HostRegexp(`{host:.+}`)
@@ -68,4 +68,3 @@ services:
       traefik.http.services.error-pages.loadbalancer.server.port: 80
     networks:
       - internal_network
-

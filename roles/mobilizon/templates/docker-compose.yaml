@@ -19,7 +19,7 @@ services:
       MOBILIZON_INSTANCE_HOST: {{ setups.mobilizon.config.domain }}
       MOBILIZON_INSTANCE_EMAIL: {{ setups.mobilizon.config.email }}
       MOBILIZON_REPLY_EMAIL: {{ setups.mobilizon.config.email }}
-      #MOBILIZON_ADMIN_EMAIL: 
+      #MOBILIZON_ADMIN_EMAIL:
       MOBILIZON_INSTANCE_REGISTRATIONS_OPEN: "true"
       MOBILIZON_DATABASE_USERNAME: mobilizon
       MOBILIZON_DATABASE_PASSWORD: {{ setups.mobilizon.config.postgres_password }}
@@ -34,7 +34,7 @@ services:
       MOBILIZON_SMTP_USERNAME: {{ smtp_user }}
       MOBILIZON_SMTP_PASSWORD: {{ smtp_pass }}
     volumes:
-      - {{ setups.mobilizon.data_dir }}/uploads:/app/uploads
+      - "{{ setups.mobilizon.data_dir }}/uploads:/app/uploads"
     labels:
       traefik.enable: true
       traefik.http.routers.mobilizon.rule: Host(`{{ setups.mobilizon.config.domain }}`)
@@ -53,7 +53,7 @@ services:
     image: postgis/postgis:13-3.1-alpine
     restart: unless-stopped
     volumes:
-      - {{ setups.mobilizon.data_dir }}/db:/var/lib/postgresql/data
+      - "{{ setups.mobilizon.data_dir }}/db:/var/lib/postgresql/data"
     environment:
       POSTGRES_USER: mobilizon
       POSTGRES_PASSWORD: {{ setups.mobilizon.config.postgres_password }}
