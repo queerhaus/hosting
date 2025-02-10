@@ -1,7 +1,7 @@
 ---
 
 - name: Copy traefik data to localhost
-  hosts: 
+  hosts:
     - hometown_host
     - collab_host
   tags: traefik
@@ -29,7 +29,7 @@
     - include_tasks: tasks/backup.yml
 
 - name: Copy codimd data to localhost
-  hosts: collab_host
+  hosts: hometown_host
   tags: codimd
   vars:
     run_dir: "{{ setups.codimd.run_dir }}"

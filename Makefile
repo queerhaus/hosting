@@ -7,17 +7,17 @@ galaxy:
 	ansible-galaxy role install -r requirements.yml
 	ansible-galaxy collection install -r requirements.yml
 
-staging: 
+staging:
 	ansible-playbook -i hosts/staging site.yml -D -K
 staging-traefik:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,traefik'
-staging-hometown: 
+staging-hometown:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,hometown'
-staging-matrix: 
+staging-matrix:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,matrix'
-staging-mobilizon: 
+staging-mobilizon:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,mobilizon'
-staging-peertube: 
+staging-peertube:
 	ansible-playbook -i hosts/staging site.yml -D -v -K -t 'basic,peertube'
 
 production:
@@ -46,6 +46,8 @@ backup-production:
 	ansible-playbook -i hosts/production backup-download.yml -K
 backup-production-hometown:
 	ansible-playbook -i hosts/production backup-download.yml -K -v -t hometown
+backup-production-codimd:
+	ansible-playbook -i hosts/production backup-download.yml -K -v -t codimd
 
 restore-staging-codimd:
 	ansible-playbook -i hosts/staging backup-restore.yml -K -v -D -t codimd
